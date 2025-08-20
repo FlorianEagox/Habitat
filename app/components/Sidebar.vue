@@ -1,40 +1,50 @@
 <template>
-    <aside>
-        <nav>
-            <ul>
-                <li><a href="#home">Tracker</a></li>
-                <li><a href="#about">Habbits</a></li>
-                <li><a href="#services">Friends</a></li>
-                <li><a href="#contact">Insights</a></li>
-            </ul>
-        </nav>
-    </aside>
+	<aside>
+		<nav>
+			<ul>
+				<li><a href="#home" class="selected"><Icon name="hugeicons:notebook-02"/> Tracker</a></li>
+				<li><a href="#about"><Icon name="material-symbols:list-alt-check-outline-sharp"/> Habbits</a></li>
+				<li><a href="#services"><Icon name="game-icons:three-friends"/> Friends</a></li>
+				<li><a href="#contact"><Icon name="material-symbols:insights"/> Insights</a></li>
+			</ul>
+		</nav>
+	</aside>
 </template>
 
-<style>
-    aside {
-        width: 250px;
-        background-color: var(--night);
-        color: var(--white);
-        padding: 20px;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-    }
+<style scoped>
+	aside {
+		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+	}
 
-    nav ul {
-        list-style-type: none;
-        padding: 0;
-    }
+	nav ul {
+		list-style-type: none;
+	}
 
-    nav ul li {
-        margin: 15px 0;
-    }
-
-    nav ul li a {
-        color: var(--citrus);
-        text-decoration: none;
-    }
-
-    nav ul li a:hover {
-        text-decoration: underline;
-    }
+	nav ul li {
+		margin: 15px 0;
+	}
+	
+	a {
+		display: block;
+		padding: 10px 20px;
+		text-decoration: none;
+		color: hsl(var(--electro));
+		border: 2px solid hsla(var(--electro));
+		border-radius: 5px;
+		/* super intense text glow */
+		text-shadow: 0 0 5px hsla(var(--purple), 1);
+		box-shadow: 0 0 10px hsla(var(--electro), 0.5);
+	}
+	a:hover {
+		background-color: hsla(var(--electro), 0.1);
+		color: hsl(var(--white));
+	}
+	nav ul li a:hover {
+		text-decoration: underline;
+	}
+	li:hover, .selected {
+		
+		background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
+		/* background-color: hsla(var(--electro), 0.5); */
+	}
 </style>

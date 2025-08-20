@@ -36,7 +36,10 @@ const splashTexts = [
 	"That will be all",
 	"You filthy... CLODS",
 	"The sun does shine for you",
-	"You're gonna die one day :)" 
+	"You're gonna die one day :)",
+	"Hai Lizzy :3 ^w^",
+	"Surveillance is better with friends",
+	"Get off the internet!"
 ];
 export default {
 	computed: {
@@ -48,7 +51,7 @@ export default {
 
 </script>
 
-<style scoped>
+<style>
 	@font-face {
 		font-family: 'alvera';
 		src: url('/fonts/alvera.otf') format('opentype');
@@ -77,7 +80,7 @@ export default {
 	}
 	#splash-text {
 		position: absolute;
-		transform:  rotate(-25deg);
+		transform:  rotate(-20deg);
 		font-size: 1.75em;
 		color: #ff00ff;
 		top: 25px;

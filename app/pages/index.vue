@@ -11,6 +11,11 @@
 </template>
 
 <style>
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
 	:root {
 		--white: 47deg, 98%, 95%;
 		--citrus: 47deg, 95%, 52%;
@@ -33,7 +38,6 @@
 	}
 
 	body {
-		margin: 0;
 		font-family: Arial, sans-serif;
 		background-color: #0a0a0a;
 		color: white;
@@ -44,6 +48,14 @@
 		min-height: 100vh;
 		align-items: center;
 		overflow-x: hidden;
+	}
+	main {
+		display: flex;
+		flex: 1;
+		width: 100%;
+		padding: 0 20px;
+		
+		justify-content: space-evenly;
 	}
 	footer {
 		margin-top: auto;
