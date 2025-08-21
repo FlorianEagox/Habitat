@@ -39,7 +39,16 @@ const splashTexts = [
 	"You're gonna die one day :)",
 	"Hai Lizzy :3 ^w^",
 	"Surveillance is better with friends",
-	"Get off the internet!"
+	"Get off the internet!",
+	"Today's Yesterday's Tomorrow",
+	"Your future self will thank you",
+	"Make it count",
+	"It is what it is",
+	"It gets easier",
+	"I'm not depressed, you're depressed!",
+	"WTF is Minecraft?",
+	"Thinking of you",
+	"999",
 ];
 export default {
 	computed: {
@@ -111,7 +120,7 @@ export default {
 		);
 		color: transparent;
 		background-clip: text;
-		-webkit-text-stroke: 2px hsl(200, 65%, 80%);
+		-webkit-text-stroke: 1px hsla(200, 65%, 80%, 0.5);
 	}
 	.raise {
 		filter: drop-shadow(1px 3px 0px hsl(242, 54%, 10%))

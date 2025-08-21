@@ -41,6 +41,15 @@
 		font-family: Arial, sans-serif;
 		background-color: #0a0a0a;
 		color: white;
+		background: linear-gradient(
+			#0D0221 0%,
+			#45125e 40%,
+			#A22561 80%,
+			#FF3864 100%
+		);
+		box-shadow:
+		0 0 100px purple,
+		0 0 200px purple;
 	}
 	#container {
 		display: flex;
@@ -56,6 +65,12 @@
 		padding: 0 20px;
 		
 		justify-content: space-evenly;
+	}
+	aside {
+		flex-basis: 25%
+	}
+	#tracker {
+		flex: 1;
 	}
 	footer {
 		margin-top: auto;
@@ -77,7 +92,7 @@
 			translate(calc(var(--ratio-x) * 1vw), calc(var(--ratio-y) * 1vh))
 			rotateZ(calc(var(--ratio-x) * -0.5deg));
 		
-		border-top: solid 1px hsla(var(--electro), .3);
+		border-top: solid 3px hsla(var(--electro), .6);
 		background-color: hsl(var(--purple));
 		background-image: radial-gradient(100% 60% at bottom, hsla(var(--electro), .1), hsla(var(--purple), 1));
 		box-shadow:
@@ -91,7 +106,7 @@
 		display: block;
 		width: 100%;
 		height: 100%;
-		
+		overflow: hidden;
 		position: absolute;
 		top: 0;
 		
@@ -101,7 +116,7 @@
 
 		background-image:
 		linear-gradient(to bottom, hsla(var(--electro), var(--alpha)) 1px, transparent 1px),
-		linear-gradient(to right, hsla(var(--electro), var(--alpha)) 1px, transparent 1px);
+		linear-gradient(to right, hsla(var(--citrus), var(--alpha)) 1px, transparent 1px);
 		background-size: 1px var(--ground-line), calc(2 * var(--ground-line)) 1px;
 		background-position: 0% 0%, center;
 		mix-blend-mode: color-dodge;
@@ -110,12 +125,15 @@
 		z-index: -1;
 	}
 	@keyframes ground-lines {
-	0% {
-		background-position: 0% 0%, center;
+		0% {
+			background-position: 0% 0%, center;
+		}
+		100% {
+			background-position: 0% 50%, center;
+		}
 	}
-	100% {
-		background-position: 0% 50%, center;
+	.glowy-text {
+		text-shadow: 0 0 5px hsla(var(--purple), 1);
+		color: hsl(var(--electro));
 	}
-}
-
 </style>

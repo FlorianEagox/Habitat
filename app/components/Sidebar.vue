@@ -1,11 +1,11 @@
 <template>
 	<aside>
 		<nav>
-			<ul>
-				<li><a href="#home" class="selected"><Icon name="hugeicons:notebook-02"/> Tracker</a></li>
-				<li><a href="#about"><Icon name="material-symbols:list-alt-check-outline-sharp"/> Habbits</a></li>
-				<li><a href="#services"><Icon name="game-icons:three-friends"/> Friends</a></li>
-				<li><a href="#contact"><Icon name="material-symbols:insights"/> Insights</a></li>
+			<ul class="glassy">
+				<li><a href="#home" class="selected glowy-text"><Icon name="hugeicons:notebook-02"/> Tracker</a></li>
+				<li><a href="#about" class="glowy-text"><Icon name="material-symbols:list-alt-check-outline-sharp"/> Habbits</a></li>
+				<li><a href="#services" class="glowy-text"><Icon name="game-icons:three-friends"/> Friends</a></li>
+				<li><a href="#contact" class="glowy-text"><Icon name="material-symbols:insights"/> Insights</a></li>
 			</ul>
 		</nav>
 	</aside>
@@ -13,10 +13,19 @@
 
 <style scoped>
 	aside {
-		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+	}
+	
+	.glassy {
+		background: rgba(255, 255, 255, 0.5);
+		backdrop-filter: blur(10px) brightness(1.1);
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 10px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 	}
 
 	nav ul {
+		padding: 1em;
+		box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
 		list-style-type: none;
 	}
 
@@ -28,16 +37,13 @@
 		display: block;
 		padding: 10px 20px;
 		text-decoration: none;
-		color: hsl(var(--electro));
 		border: 2px solid hsla(var(--electro));
 		border-radius: 5px;
-		/* super intense text glow */
-		text-shadow: 0 0 5px hsla(var(--purple), 1);
 		box-shadow: 0 0 10px hsla(var(--electro), 0.5);
 	}
 	a:hover {
 		background-color: hsla(var(--electro), 0.1);
-		color: hsl(var(--white));
+		color: hsl(var(--citrus));
 	}
 	nav ul li a:hover {
 		text-decoration: underline;
