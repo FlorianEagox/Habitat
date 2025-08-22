@@ -40,6 +40,14 @@
 			return {
 				habits: [
 					{
+						name: "Wake up time",
+						type: "duration",
+						datesCompleted: [],
+						completedToday: false,
+						degreeOfCompletion: 0.8,
+						goal: 8
+					},
+					{
 						name: "Play Piano",
 						type: "duration",
 						datesCompleted: [],
@@ -77,7 +85,15 @@
 						datesCompleted: [],
 						completedToday: false,
 						degreeOfCompletion: 1,
-					}
+					},
+					{
+						name: "Journal",
+						type: "duration",
+						datesCompleted: [],
+						completedToday: false,
+						degreeOfCompletion: 0.8,
+						goal: 20
+					},
 				],
 				listedDates
 			};
@@ -97,13 +113,6 @@
 </script>
 
 <style>
-	h2 {
-		/* text-align: center; */
-		color: hsl(var(--electro));
-		margin: 0.4em;
-		font-family: "Fredoka One";
-		text-align: center;
-	}
 	#tracker {
 		width: 900px;
 		height: 500px;

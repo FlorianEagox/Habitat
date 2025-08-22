@@ -13,6 +13,9 @@ export default {
 </script>
 
 <style scoped>
+	footer {
+		margin-top: auto;
+	}
 	a {
 		color: hsl(var(--citrus));
 	}

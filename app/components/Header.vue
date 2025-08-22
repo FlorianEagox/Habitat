@@ -1,11 +1,11 @@
 <template>
 	<header>
-		<img src="~/assets/sysaphus.png" alt="Vaporwave Sysaphus" />
+		<img src="~/assets/sisyphus.png" alt="Vaporwave Sysaphus" />
 		<div id="heading">
 			<h1 id="title" class="metal raise">Habitat</h1>
 			<span id="splash-text" v-text="splashText"/>
 		</div>
-		<img src="~/assets/sysaphus.png" alt="Vaporwave Sysaphus" />
+		<img src="~/assets/sisyphus.png" alt="Vaporwave Sysaphus" />
 		<!-- <nav>
 			<ul>
 				<li><a href="/">Home</a></li>
