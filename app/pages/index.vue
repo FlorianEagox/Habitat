@@ -4,7 +4,7 @@
 			<h2 class="metal">Conquer Yourself</h2>
 			<div id="enticement">
 				<section id="description">
-					<p>All change starts from the bottom up. No matter your material circumstances, there are are simple things you can do for yourself that make you more prepared to achieve difficult things. It's time to start becoming the person you want to be.</p>
+					<p>All change starts from the bottom up. No matter your material circumstances, there are simple things you can do for yourself that make you more prepared to achieve difficult things. It's time to start becoming the person you want to be.</p>
 					<p>Set goals, track your progress, and invite friends to keep eachother accountable. Stop pushing that boulder up the hill; roll it down the other side!</p>
 					<button @click="triggerSignup"><span class="metal raised">Chase the Rising Sun</span></button>
 				</section>
