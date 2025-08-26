@@ -21,11 +21,7 @@ definePageMeta({
   layout: 'logged-out'
 })
 export default {
-	methods: {
-		triggerSignup() {
-			
-		}
-	}
+
 }
 </script>
 

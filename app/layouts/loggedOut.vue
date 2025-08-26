@@ -2,7 +2,7 @@
 	<div id="container">
   		<Header />
 		<slot />
-		<GridGround />
+		<GridGround /> 
 		<Footer />
 	</div>
 </template>
