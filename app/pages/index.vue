@@ -8,21 +8,29 @@
 					<p>Set goals, track your progress, and invite friends to keep eachother accountable. Stop pushing that boulder up the hill; roll it down the other side!</p>
 					<button @click="triggerSignup"><span class="metal raised">Chase the Rising Sun</span></button>
 				</section>
+				    <!-- <button @click="openInPopup('/auth/github')">Login with GitHub</button> -->
 				<img src="~/assets/sexysisyphus.png" alt="Sisyphus is vibing and sexy today chilling in the vaporwave sunset. He's got this." />
 			</div>
 		</article>
-		<!-- hidden div that looks like the sun to rise with register/auth -->
-		
+		<Auth />
+		{{ data }}
+		<!-- hidden div that looks like the sun to rise with register/auth -->		
 	</main>
 </template>
 
-<script>
+<script setup>
+// const { loggedIn, user, session, fetch, clear, openInPopup } = useUserSession()
 definePageMeta({
   layout: 'logged-out'
 })
-export default {
-
-}
+const { data, error, pending, refresh } = await useAsyncGql({
+  operation: 'ships',
+  variables: { limit: 15 },
+  options: {
+    transform: (data) => data.ships.map((ship) => ship.name),
+  }
+})
+console.log("AHH", data)
 </script>
 
 <style>

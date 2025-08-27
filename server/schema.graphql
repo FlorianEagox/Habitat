@@ -1,0 +1,35 @@
+# GraphQL schema for users, habits, and friends
+
+type User {
+	id: ID!
+	username: String!
+	email: String!
+	friends: [User!]!
+	habits: [Habit!]!
+}
+
+type Habit {
+	id: ID!
+	name: String!
+	description: String
+	createdAt: String!
+	completedDates: [String!]!
+	owner: User!
+}
+
+type Query {
+	me: User
+	user(id: ID!): User
+	users: [User!]!
+	habit(id: ID!): Habit
+	habits: [Habit!]!
+}
+
+type Mutation {
+	signup(username: String!, email: String!, password: String!): User
+	login(email: String!, password: String!): String
+	addHabit(name: String!, description: String): Habit
+	completeHabit(habitId: ID!, date: String!): Habit
+	addFriend(friendId: ID!): User
+}
+
