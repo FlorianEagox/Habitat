@@ -10,18 +10,22 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/h3": "^2.0.0",
     "@nuxt/eslint": "1.9.0",
     "@nuxt/fonts": "0.11.4",
     "@nuxt/icon": "2.0.0",
+    "apollo": "^2.34.0",
+    "bcryptjs": "^3.0.2",
     "eslint": "^9.0.0",
-    "graphql": "^16.7.1",
+    "graphql": "^16.11.0",
     "graphql-subscriptions": "^3.0.0",
     "graphql-ws": "^6.0.6",
     "monk": "^7.3.4",
     "nuxt": "^4.0.3",
     "nuxt-auth-utils": "0.5.23",
     "nuxt-graphql-client": "0.2.46",
-    "nuxt-graphql-server": "3.1.5",
+    "nuxt-graphql-server": "^3.1.5",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
   }

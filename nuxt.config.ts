@@ -1,10 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	compatibilityDate: '2025-07-15',
+	ssr: true,
 	devtools: { enabled: true },
 	// set the host to the a domain
 	devServer: {
-			host: 'tessapainter.com',
+		host: 'tessapainter.com',
 	},
 	modules: [
 		'@nuxt/fonts',
@@ -15,11 +16,16 @@ export default defineNuxtConfig({
 		'nuxt-graphql-server',
 		'nuxt-auth-utils',
 	],
+	"graphql-client": {
+		codegen: {
+			avoidOptionals: true
+		}
+	},
 	runtimeConfig: {
 		public: {
 			// GQL_HOST: "/api/graphql",
 			// GQL_HOST: 'https://api.spacex.land/graphql' // overwritten by process.env.GQL_HOST
-			GQL_HOST: 'https://spacex-api-2gl6xp7kua-ue.a.run.app/query'
+			GQL_HOST: 'http://tessapainter.com:3000/api/query'
 		}
 	}
 })

@@ -23,14 +23,13 @@
 definePageMeta({
   layout: 'logged-out'
 })
+
+
 const { data, error, pending, refresh } = await useAsyncGql({
-  operation: 'ships',
-  variables: { limit: 15 },
-  options: {
-    transform: (data) => data.ships.map((ship) => ship.name),
-  }
+	operation: 'user',
+	variables: { username: 'newuser', password: 'password123' },
 })
-console.log("AHH", data)
+console.log("rAHH", data.value, error, pending)
 </script>
 
 <style>
@@ -74,7 +73,15 @@ console.log("AHH", data)
 		object-fit: cover;
 	}
 	button, button:active {
-		background: linear-gradient(-180deg, hsl(var(--violet)), hsl(var(--citrus)));
+		background: linear-gradient(
+			-180deg,
+			hsl(var(--violet)) 33%,
+			hsl(var(--citrus)) 66%,
+			hsl(var(--violet)) 100%
+		);
+		background-size: 100% 200%;
+		background-position: 0 33%;
+		
 		box-shadow: 0 0 10px hsla(var(--violet), 0.7);
 		border-radius: 7px;
 		font-size: 2rem;
@@ -82,10 +89,10 @@ console.log("AHH", data)
 		padding: 0.3em 0.8em;
 		margin-top: 1em;
 		font-weight: bold;
-		transition: all 0.1s ease;
+		transition: all 2s cubic-bezier(0.4, 2, .6, 1);
 	}
 	button:hover {
-		background: linear-gradient(-180deg, hsl(var(--citrus)), hsl(var(--violet)));
+		background-position: 0 95%;
 		box-shadow: 0 0 10px hsla(var(--citrus), 0.7);
 		cursor: pointer;
 	}

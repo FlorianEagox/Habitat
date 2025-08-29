@@ -49,6 +49,12 @@ const splashTexts = [
 	"WTF is Minecraft?",
 	"Thinking of you",
 	"999",
+	"Just keep swimming",
+	"Vaporware in training",
+	"You're the poison and the antitode",
+	"That's my purse, Idk u!!!",
+	"u like jazz?",
+	"Streaking in the summertime"
 ];
 export default {
 	computed: {
