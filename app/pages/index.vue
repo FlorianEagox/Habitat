@@ -29,7 +29,7 @@ const { data, error, pending, refresh } = await useAsyncGql({
 	operation: 'user',
 	variables: { username: 'newuser', password: 'password123' },
 })
-console.log("rAHH", data.value, error, pending)
+console.log("rAHH", data.value, error, pending.value)
 </script>
 
 <style>

@@ -1,4 +1,4 @@
-import { Resolvers } from '#graphql/resolver';
+// import { Resolvers } from '#graphql/resolver';
 import { typeDefs } from '#graphql/schema';
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateH3Handler } from '@as-integrations/h3';

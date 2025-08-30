@@ -3,7 +3,7 @@
         <h3>Get Tracking!</h3>
         <form action="">
             <label for="username">Choose a username</label>
-            <input type="text" id="username" :value="this.username" name="username" required />
+            <input type="text" id="username" :value="username" name="username" required />
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required />
             <label for="password">Password:</label>

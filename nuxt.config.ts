@@ -17,15 +17,15 @@ export default defineNuxtConfig({
 		'nuxt-auth-utils',
 	],
 	"graphql-client": {
+		documentPaths: ['./server', '../server', '../server/schema.graphql'],
 		codegen: {
-			avoidOptionals: true
+			avoidOptionals: true,
+			silent: false,
 		}
 	},
 	runtimeConfig: {
 		public: {
-			// GQL_HOST: "/api/graphql",
-			// GQL_HOST: 'https://api.spacex.land/graphql' // overwritten by process.env.GQL_HOST
-			GQL_HOST: 'http://tessapainter.com:3000/api/query'
+			GQL_HOST: 'http://tessapainter.com:3000/api/graphql'
 		}
 	}
 })
