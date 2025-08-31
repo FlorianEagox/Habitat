@@ -28,9 +28,4 @@
 	#tracker {
 		flex: 1;
 	}
-
-	.glowy-text {
-		text-shadow: 0 0 5px hsla(var(--purple), 1);
-		color: hsl(var(--electro));
-	}
 </style>

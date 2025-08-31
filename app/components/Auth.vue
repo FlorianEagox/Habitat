@@ -1,34 +1,147 @@
+<script setup>
+import { ref, onMounted, useTemplateRef } from 'vue';
+
+const tab = ref('register');
+
+// refs for registration
+const txtUsername = ref(null);
+const registerUsername = ref('');
+const registerEmail = ref('');
+const registerPassword = ref('');
+
+const loginUser = ref('');
+const loginPassword = ref('');
+
+
+let seep = ref(0);
+
+
+
+async function handleSubmit(e) {
+	e.preventDefault();
+	try {
+		const result = await (GqlRegister({username: registerUsername.value, email: registerEmail.value, password: registerPassword.value}));
+		console.log({result})
+		seep.value = await GqlUser({id: result.register.id})
+		console.log(result, seep.value)
+	} catch(e) {
+		console.log(e)
+	}
+}
+onMounted(() => {
+	txtUsername.value.focus()
+	txtUsername.value.scrollIntoView({behavior: 'smooth'})
+});
+</script>
+
 <template>
-    <main id="auth">
-        <h3>Get Tracking!</h3>
-        <form action="">
-            <label for="username">Choose a username</label>
-            <input type="text" id="username" :value="username" name="username" required />
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required />
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required />
-            <button type="submit" @click="handleSubmit">Letsa go</button>
-        </form>
-    </main>
+	<div id="auth" class="sun glowy-text">
+		<div class="tabs glassy">
+			<input type="radio" name="tabSelection" id="tabRegister" value="register" v-model="tab" hidden selected>
+			<label for="tabRegister"><h3>Get Tracking!</h3></label>
+
+			<input type="radio" name="tabSelection" id="tabLogin" value="login" v-model="tab" hidden>
+			<label for="tabLogin"><h3>Log In</h3></label>
+		</div>
+		<form v-if="tab == 'register'" action="">
+			<label for="username" class="cheese">Choose a username</label>
+			<input type="text" id="username" class="glassy" v-model="registerUsername" name="username" ref="txtUsername" required/>
+			<label for="email">Email:</label>
+			<input type="email" id="email" class="glassy" v-model="registerEmail" name="email" required />
+			<label for="password">Password:</label>
+			<input type="password" id="password" class="glassy" v-model="registerPassword" required />
+			<button class="glassy" @click="handleSubmit">Letsa go</button>
+		</form>
+		<form v-else action="">
+			<label for="loginUser">Email/Username:</label>
+			<input type="email" id="loginUser" class="glassy"  v-model="loginUser" name="user" required />
+			<label for="loginPassword">Password:</label>
+			<input type="password" id="loginPassword" class="glassy"  v-model="loginPassword" required />
+			<button class="glassy" @click="handleLogin">Letsa go</button>
+			<a href="#">Forgot username/password?</a>
+		</form>
+		<pre>{{seep}}</pre>
+	</div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
+<style lang="scss">
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
-const handleSubmit = async () => {
-    const { data, error } = useAsyncGql({
-        operation: 'register',
-        variables: { username: this.username.value, email: email.value, password: password.value },
-    });
-    if (error.value) {
-        console.error('Registration error:', error.value);
-    } else {
-        console.log('Registration successful:', data.value);
-        // Handle successful registration (e.g., redirect to login or dashboard)
-    }
-}
-</script>
+	#auth {
+		text-align: center;
+		margin-top: 2em;
+		margin: auto;
+		display: inline-block;
+		padding: 1em;
+		width: auto;
+		height: auto;
+		// clip-path: polygon(
+		// 0% 0%, 100% 0%, 100% 35%, 0% 35%,
+		// 0% 45%, 100% 45%, 100% 52%, 0% 52%,
+		// 0% 58%, 100% 58%, 100% 63%, 0% 63%,
+		// 0% 68%, 100% 68%, 100% 73%, 0% 73%,
+		// 0% 78%, 100% 78%, 100% 100%, 0% 100%
+		// );
+		clip-path: none;
+	}
+	.tabs {
+		display: flex;
+		justify-content: center;
+		border-bottom: 3px dashed hsla(var(--electro), 0.9) !important;
+	}
+	label {
+		padding: 0.4em;
+		border-radius: 15px;
+	}
+
+	form {
+		display: flex;
+		flex-direction: column;
+		width: 90%;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-gap: 0.3em;
+		padding: 0.5em;
+	}
+	
+	label {
+		white-space: nowrap;
+		margin: 0.3em;
+		text-align: left;
+		font-weight: bold;
+		// display: inline-block;
+	}
+
+	input {
+		color: var(--citrus);
+		border: none;
+		border-bottom: 3px dashed hsla(var(--electro), 0.7) !important;
+		background: none;
+		border-radius: 5px;
+		// width: 90%;
+		margin: auto;
+		text-shadow: inherit;
+		// outline: none;
+		// inset: none;
+		padding: 0.5em 1em;
+	}
+
+	form button {
+		margin: 0.3em;
+		padding: 0.5em;
+		border: 3px dashed hsla(var(--electro), 0.9) !important;
+		// background: hsla(var(--electro), 0.2);
+		margin: 0.25em;
+		color: inherit;
+		background: none;
+		text-shadow: inherit;
+		font-weight: bold;
+		grid-column: 2;
+		justify-self: center;
+		width: 70%;
+	}
+	form a {
+		grid-column: span 2;
+		color: inherit;
+		margin: 0.2em;
+	}
+</style>

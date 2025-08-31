@@ -13,7 +13,7 @@ export default {
 		height: calc(var(--ground-size) + 1vh);
 		width: 120vw;
 
-		position: absolute;
+		position: fixed;
 		left: -10vw;
 		bottom: -1vh;
 		z-index: -1;

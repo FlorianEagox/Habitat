@@ -37,9 +37,5 @@
 	nav ul li a:hover {
 		text-decoration: underline;
 	}
-	li:hover, .selected {
-		
-		background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
-		/* background-color: hsla(var(--electro), 0.5); */
-	}
+	
 </style>

@@ -1,38 +1,37 @@
+<script setup>
+import { useTemplateRef } from 'vue';
+// const { loggedIn, user, session, fetch, clear, openInPopup } = useUserSession()
+definePageMeta({
+  layout: 'logged-out'
+})
+const auth = useTemplateRef("auth");
+const showSun = ref(false)
+</script>
+
 <template>
-	<main>
+	<main class="container">
 		<article id="splash" class="glassy">
 			<h2 class="metal">Conquer Yourself</h2>
 			<div id="enticement">
 				<section id="description">
 					<p>All change starts from the bottom up. No matter your material circumstances, there are simple things you can do for yourself that make you more prepared to achieve difficult things. It's time to start becoming the person you want to be.</p>
 					<p>Set goals, track your progress, and invite friends to keep eachother accountable. Stop pushing that boulder up the hill; roll it down the other side!</p>
-					<button @click="triggerSignup"><span class="metal raised">Chase the Rising Sun</span></button>
+					<button @click="() => showSun = true"><span class="metal raised">Chase the Rising Sun</span></button>
 				</section>
 				    <!-- <button @click="openInPopup('/auth/github')">Login with GitHub</button> -->
 				<img src="~/assets/sexysisyphus.png" alt="Sisyphus is vibing and sexy today chilling in the vaporwave sunset. He's got this." />
 			</div>
 		</article>
-		<Auth />
-		{{ data }}
-		<!-- hidden div that looks like the sun to rise with register/auth -->		
+		<Auth ref="auth" v-if="showSun"/>
+		<!-- <Auth /> -->
 	</main>
 </template>
 
-<script setup>
-// const { loggedIn, user, session, fetch, clear, openInPopup } = useUserSession()
-definePageMeta({
-  layout: 'logged-out'
-})
-
-
-const { data, error, pending, refresh } = await useAsyncGql({
-	operation: 'user',
-	variables: { username: 'newuser', password: 'password123' },
-})
-console.log("rAHH", data.value, error, pending.value)
-</script>
-
 <style>
+	main {
+		display: flex;
+		flex-direction: column;
+	}
 	#splash {
 		font-size: 1.5rem;
 		text-align: center;
@@ -42,6 +41,7 @@ console.log("rAHH", data.value, error, pending.value)
 		margin-top: 4rem;
 		padding-top: 0;
 		position: relative;
+		margin-bottom: 1em;
 	}
 	h2 {
 		/* text-align: center; */
@@ -59,7 +59,7 @@ console.log("rAHH", data.value, error, pending.value)
 		margin-top: 3rem;
 		display: flex;
 	}
-	p {
+	#enticement p {
 		padding: 0.5rem;
 		line-height: 1.4;
 	}
@@ -72,7 +72,7 @@ console.log("rAHH", data.value, error, pending.value)
 		box-shadow: 0 0 20px hsla(var(--purple), 0.7);
 		object-fit: cover;
 	}
-	button, button:active {
+	#enticement button, button:active {
 		background: linear-gradient(
 			-180deg,
 			hsl(var(--violet)) 33%,
@@ -91,10 +91,12 @@ console.log("rAHH", data.value, error, pending.value)
 		font-weight: bold;
 		transition: all 2s cubic-bezier(0.4, 2, .6, 1);
 	}
-	button:hover {
+	#enticement button:hover {
 		background-position: 0 95%;
 		box-shadow: 0 0 10px hsla(var(--citrus), 0.7);
 		cursor: pointer;
 	}
-
+	#auth {
+		margin: 4em auto;
+	}
 </style>

@@ -113,7 +113,7 @@
 </script>
 
 <style>
-	#tracker {
+	#tracker, .sun {
 		width: 900px;
 		height: 500px;
 		color: hsl(var(--electro));

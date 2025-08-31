@@ -1,0 +1,124 @@
+# Register a new user
+mutation register($username: String!, $email: String!, $password: String!) {
+  register(username: $username, email: $email, password: $password) {
+    id
+    username
+    email
+  }
+}
+
+# Login and get a token
+mutation login($email: String!, $password: String!) {
+  login(email: $email, password: $password)
+}
+
+# Add a new habit
+mutation addHabit($name: String!, $description: String) {
+  addHabit(name: $name, description: $description) {
+    id
+    name
+    description
+    createdAt
+    completedDates
+    owner {
+      id
+      username
+    }
+  }
+}
+
+# Complete a habit for a specific date
+mutation completeHabit($habitId: ID!, $date: String!) {
+  completeHabit(habitId: $habitId, date: $date) {
+    id
+    name
+    completedDates
+  }
+}
+
+# Add a friend by ID
+mutation addFriend($friendId: ID!) {
+  addFriend(friendId: $friendId) {
+    id
+    username
+    friends {
+      id
+      username
+    }
+  }
+}
+
+# Get the current user
+query me {
+  me {
+    id
+    username
+    email
+    friends {
+      id
+      username
+    }
+    habits {
+      id
+      name
+      completedDates
+    }
+  }
+}
+
+# Get a user by ID
+query user($id: ID!) {
+  user(id: $id) {
+    id
+    username
+    email
+    friends {
+      id
+      username
+    }
+    habits {
+      id
+      name
+      completedDates
+    }
+  }
+}
+
+# Get all users
+query users {
+  users {
+    id
+    username
+    email
+  }
+}
+
+# Get a habit by ID
+query habit($id: ID!) {
+  habit(id: $id) {
+    id
+    name
+    description
+    createdAt
+    completedDates
+    owner {
+      id
+      username
+    }
+  }
+}
+
+# Get all habits
+query habits {
+  habits {
+    id
+    name
+    description
+    createdAt
+    completedDates
+    owner {
+      id
+      username
+    }
+  }
+}

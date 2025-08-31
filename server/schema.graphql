@@ -4,8 +4,8 @@ type User {
 	id: ID!
 	username: String!
 	email: String!
-	friends: [User!]!
-	habits: [Habit!]!
+	friends: [User!]
+	habits: [Habit!]
 }
 
 type Habit {

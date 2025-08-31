@@ -27,4 +27,5 @@ export default {
 		border-radius: 25px;
 		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 	}
+	
 </style>
