@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, useTemplateRef } from 'vue';
+import { authClient } from '../app.vue'
 
 const tab = ref('register');
 
@@ -13,20 +14,22 @@ const loginUser = ref('');
 const loginPassword = ref('');
 
 
-let seep = ref(0);
-
-
-
-async function handleSubmit(e) {
+async function handleRegister(e) {
 	e.preventDefault();
-	try {
-		const result = await (GqlRegister({username: registerUsername.value, email: registerEmail.value, password: registerPassword.value}));
-		console.log({result})
-		seep.value = await GqlUser({id: result.register.id})
-		console.log(result, seep.value)
-	} catch(e) {
-		console.log(e)
-	}
+	const {data, error} = await authClient.signUp.email({
+		email: registerEmail.value,
+		name: registerUsername.value, 
+		password: registerPassword.value
+	}, {
+		onSuccess: () => navigateTo('/tracker')
+	})
+}
+async function handleLogin(e) {
+	e.preventDefault()
+	const {data, error} = await authClient.signIn.email(
+		{ email: loginUser.value, password: loginPassword.value }, 
+		{ onSuccess: () => navigateTo('/tracker') }
+	);
 }
 onMounted(() => {
 	txtUsername.value.focus()
@@ -50,7 +53,7 @@ onMounted(() => {
 			<input type="email" id="email" class="glassy" v-model="registerEmail" name="email" required />
 			<label for="password">Password:</label>
 			<input type="password" id="password" class="glassy" v-model="registerPassword" required />
-			<button class="glassy" @click="handleSubmit">Letsa go</button>
+			<button class="glassy" @click="handleRegister">Letsa go</button>
 		</form>
 		<form v-else action="">
 			<label for="loginUser">Email/Username:</label>
@@ -60,7 +63,6 @@ onMounted(() => {
 			<button class="glassy" @click="handleLogin">Letsa go</button>
 			<a href="#">Forgot username/password?</a>
 		</form>
-		<pre>{{seep}}</pre>
 	</div>
 </template>
 
@@ -87,10 +89,19 @@ onMounted(() => {
 		display: flex;
 		justify-content: center;
 		border-bottom: 3px dashed hsla(var(--electro), 0.9) !important;
+		padding: 0.5em;
 	}
-	label {
+	.tabs label {
+		width: 100%;
+	}
+	.tabs h3 {
 		padding: 0.4em;
 		border-radius: 15px;
+		margin: auto;
+		display: inline-block;
+	}
+	.tabs > label:first-of-type {
+		border-right: 3px dashed hsl(var(--electro)); // hsl(var(--electro));
 	}
 
 	form {
@@ -103,12 +114,11 @@ onMounted(() => {
 		padding: 0.5em;
 	}
 	
-	label {
+	form label {
 		white-space: nowrap;
 		margin: 0.3em;
 		text-align: left;
 		font-weight: bold;
-		// display: inline-block;
 	}
 
 	input {

@@ -1,3 +1,11 @@
+<script>
+import { createAuthClient } from 'better-auth/vue';
+const authClient = createAuthClient({});
+const session = await authClient.getSession()
+
+export {authClient, session};
+</script>
+
 <template>
 	<div>
 		<NuxtRouteAnnouncer />
@@ -6,6 +14,7 @@
 		</NuxtLayout>
 	</div>
 </template>
+
 <style>
 	* {
 		margin: 0;
@@ -85,7 +94,7 @@
 	li:hover,
 	.selected,
 	button:hover,
-	input[type="radio"]:checked + label {	
+	input[type="radio"]:checked + label > h3 {	
 		background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
 		/* background-color: hsla(var(--electro), 0.5); */
 	}

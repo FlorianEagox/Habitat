@@ -8,9 +8,10 @@
 </template>
 
 <script>
-export default {
+import { session } from '../app.vue';
 
-}
+if(session.data)
+	navigateTo('/tracker');
 </script>
 
 <style>

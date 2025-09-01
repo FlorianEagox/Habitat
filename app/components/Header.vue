@@ -13,10 +13,17 @@
 				<li><a href="/contact">Contact</a></li>
 			</ul>
 		</nav> -->
+		<div v-if="session.data" id="user" class="glassy">
+			<span>{{ session.data.user.name }}</span>
+			<button id="logout" @click="triggerLogout">Log Out</button>
+		</div>
 	</header>
 </template>
 
-<script>
+<script setup>
+import { authClient, session } from '~/app.vue';
+import { computed } from 'vue';
+
 const splashTexts = [
 	"Become your best self",
 	"Big Bestie is watching",
@@ -56,14 +63,14 @@ const splashTexts = [
 	"u like jazz?",
 	"Streaking in the summertime"
 ];
-export default {
-	computed: {
-		splashText() {
-			return splashTexts[Math.floor(Math.random() * splashTexts.length)];
-		}
-	}
-};
-
+const splashText = computed(() => {
+	return splashTexts[Math.floor(Math.random() * splashTexts.length)];
+});
+function triggerLogout() {
+	authClient.signOut({fetchOptions: {
+		onSuccess: () => navigateTo('/')
+	}})
+}
 </script>
 
 <style>
@@ -80,7 +87,11 @@ export default {
 	}
 	header {
 		display: flex;
-		align-content: center;
+		justify-content: center;
+		align-items: center;
+		position: relative;
+		width: 100%;
+		margin-top: 1em;
 	}
 	#heading {
 		position: relative;
@@ -135,5 +146,26 @@ export default {
 		drop-shadow(1px 3px 0px hsl(242, 54%, 25%))
 		drop-shadow(1px 3px 0px hsl(242, 54%, 30%))
 		drop-shadow(0px 0px 10px rgba(16, 16, 16, 0.4));
+	}
+	
+	#user {
+		position: absolute;
+		display: inline-block;
+		padding: 0.75em;
+		right: 2em;
+	}
+	#user > * {
+		margin: 0.25em;
+	}
+	#logout {
+		border-radius: 15px;
+		padding: 0.5em;
+		border: none;
+		border: 2px dashed maroon;
+		background: #ffffffaa
+	}
+	#logout:hover {
+		background: linear-gradient(-180deg, maroon, hsl(var(--purple)));
+
 	}
 </style>

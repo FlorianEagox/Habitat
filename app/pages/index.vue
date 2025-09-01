@@ -1,6 +1,6 @@
 <script setup>
 import { useTemplateRef } from 'vue';
-// const { loggedIn, user, session, fetch, clear, openInPopup } = useUserSession()
+
 definePageMeta({
   layout: 'logged-out'
 })
@@ -72,7 +72,7 @@ const showSun = ref(false)
 		box-shadow: 0 0 20px hsla(var(--purple), 0.7);
 		object-fit: cover;
 	}
-	#enticement button, button:active {
+	#enticement button, #enticement button:active {
 		background: linear-gradient(
 			-180deg,
 			hsl(var(--violet)) 33%,

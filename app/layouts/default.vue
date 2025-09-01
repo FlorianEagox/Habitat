@@ -10,9 +10,16 @@
     </div>
 </template>
 
+<script setup>
+import { session } from '~/app.vue';
+if(!session.data)
+	navigateTo('/');
+</script>
+
 <style>
 	#dashboard {
 		display: flex;
+		flex-direction: row;
 		flex: 1;
 		width: 90%;
 		margin-top: 1em;
