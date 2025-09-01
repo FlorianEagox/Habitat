@@ -1,10 +1,9 @@
 <script>
 import { createAuthClient } from 'better-auth/vue';
-const authClient = createAuthClient({});
-const session = await authClient.getSession()
+export const authClient = createAuthClient({});
 
-export {authClient, session};
 </script>
+
 
 <template>
 	<div>
@@ -71,21 +70,34 @@ export {authClient, session};
 	  	width: 100vw;
 		/* z-index: -2; */
 	}
-	#tracker, .sun {
-		width: 900px;
-		height: 500px;
+	.sun {
+		position: relative;
+		color: hsl(var(--electro));
+		border-radius: 25px;
+		overflow: visible; /* make sure content can overflow if needed */
 		color: hsl(var(--electro));
 		/* synthwave sun */
+	}
+	.sun::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background-image: linear-gradient(orange, gold, red, purple);
+		clip-path: polygon(
+  -50% 0%, 150% -20%, 150% 35%, -50% 35%,
+  -50% 42%, 150% 42%, 150% 50%, 0 50%,
+  -50% 55%, 150% 55%, 150% 60%, 0 60%,
+  -50% 62%, 150% 62%, 150% 65%, 0 65%,
+  -50% 67%, 150% 67%, 150% 70%, 0 70%,
+  -50% 72%, 150% 72%, 150% 75%, 0 75%,
+  -50% 76%, 150% 76%, 150% 150%, 0 150%
+);
 		border-radius: 25px;
-		background-image: linear-gradient(orange,gold, red, purple),linear-gradient(black,white);
-		clip-path: polygon(-50% 0px,150% -50%,150% 55%,-50% 55%,
-		-50% 62%,150% 62%,150% 70%,0 70%,
-		-50% 75%,150% 75%,150% 80%,0 80%,
-		-50% 82%,150% 82%,150% 85%,0 85%,
-		-50% 87%,150% 87%,150% 90%,0 90%,
-		-50% 92%,150% 92%,150% 95%,0 95%,
-		-50% 96%,150% 96%,150% 150%,0 150%);
 		box-shadow: rgba(255,128,0,0.7) 0px 0 20px;
+		z-index: 0;
 	}
 	.glowy-text {
 		text-shadow: 0 0 5px hsla(var(--purple), 1);

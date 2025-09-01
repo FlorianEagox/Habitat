@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { authClient, session } from '~/app.vue';
+import { authClient } from '~/app.vue';
 import { computed } from 'vue';
 
 const splashTexts = [
@@ -71,6 +71,7 @@ function triggerLogout() {
 		onSuccess: () => navigateTo('/')
 	}})
 }
+const session = authClient.useSession();
 </script>
 
 <style>
@@ -165,7 +166,7 @@ function triggerLogout() {
 		background: #ffffffaa
 	}
 	#logout:hover {
-		background: linear-gradient(-180deg, maroon, hsl(var(--purple)));
+		background: linear-gradient(-180deg, red, hsl(var(--purple)));
 
 	}
 </style>

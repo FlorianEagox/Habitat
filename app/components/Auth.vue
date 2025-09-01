@@ -118,10 +118,10 @@ onMounted(() => {
 		white-space: nowrap;
 		margin: 0.3em;
 		text-align: left;
-		font-weight: bold;
+		font-weight: bolder;
 	}
 
-	input {
+	form input {
 		color: var(--citrus);
 		border: none;
 		border-bottom: 3px dashed hsla(var(--electro), 0.7) !important;

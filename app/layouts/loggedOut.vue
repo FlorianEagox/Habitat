@@ -7,11 +7,10 @@
 	</div>
 </template>
 
-<script>
-import { session } from '../app.vue';
-
-if(session.data)
-	navigateTo('/tracker');
+<script setup>
+definePageMeta({
+	requireAuth: false
+});
 </script>
 
 <style>

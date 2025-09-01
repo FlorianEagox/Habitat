@@ -11,11 +11,10 @@
 </template>
 
 <script setup>
-import { session } from '~/app.vue';
-if(!session.data)
-	navigateTo('/');
+definePageMeta({
+	requireAuth: true
+});
 </script>
-
 <style>
 	#dashboard {
 		display: flex;
@@ -25,7 +24,7 @@ if(!session.data)
 		margin-top: 1em;
 		padding: 0 20px;
 		max-width: 100%;
-		overflow: hidden;
+		margin-top: 3em;
 		justify-content: space-evenly;
 	}
 
