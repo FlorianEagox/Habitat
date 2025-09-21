@@ -9,6 +9,11 @@ export const auth = betterAuth({
 	telemetry: {enabled: false},
 	user: {
 		modelName: 'users',
+		additionalFields: {
+			habitsId: {type: 'string', required: false},
+			friends: {type: 'string[]', required: false, default: []},
+			avatar: {type: 'string', required: false, default: ''},
+		}
 	},
 	advanced: {
 		cookiePrefix: "habitat",

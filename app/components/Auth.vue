@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted, useTemplateRef } from 'vue';
 import { authClient } from '../app.vue'
-
 const tab = ref('register');
 
 // refs for registration
@@ -13,6 +12,7 @@ const registerPassword = ref('');
 const loginUser = ref('');
 const loginPassword = ref('');
 
+const fuckies = ref('');
 
 async function handleRegister(e) {
 	e.preventDefault();
@@ -21,14 +21,18 @@ async function handleRegister(e) {
 		name: registerUsername.value, 
 		password: registerPassword.value
 	}, {
-		onSuccess: () => navigateTo('/tracker')
+		onSuccess: () => navigateTo('/tracker'),
+		onError: (ctx) => fuckies.value = ctx.error.message
 	})
 }
 async function handleLogin(e) {
 	e.preventDefault()
 	const {data, error} = await authClient.signIn.email(
 		{ email: loginUser.value, password: loginPassword.value }, 
-		{ onSuccess: () => navigateTo('/tracker') }
+		{ 
+			onSuccess: () => navigateTo('/tracker'), 
+			onError: (ctx) => fuckies.value = ctx.error.message
+		}
 	);
 }
 onMounted(() => {
@@ -63,6 +67,7 @@ onMounted(() => {
 			<button class="glassy" @click="handleLogin">Letsa go</button>
 			<a href="#">Forgot username/password?</a>
 		</form>
+		<div id="fuckies" v-if="fuckies">Oopsie Poopsie: <span class="error-text" v-text="fuckies" /></div>
 	</div>
 </template>
 
@@ -119,6 +124,7 @@ onMounted(() => {
 		margin: 0.3em;
 		text-align: left;
 		font-weight: bolder;
+		text-shadow: inherit;
 	}
 
 	form input {
@@ -134,7 +140,9 @@ onMounted(() => {
 		// inset: none;
 		padding: 0.5em 1em;
 	}
-
+	form input[type="radio"] {
+		display: none !important;
+	}
 	form button {
 		margin: 0.3em;
 		padding: 0.5em;
@@ -153,5 +161,11 @@ onMounted(() => {
 		grid-column: span 2;
 		color: inherit;
 		margin: 0.2em;
+	}
+	#fuckies {
+		margin-top: 1em;
+		background: red;
+		font-weight: bold;
+		color: white;
 	}
 </style>

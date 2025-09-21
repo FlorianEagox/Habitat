@@ -4,7 +4,6 @@ import { useTemplateRef } from 'vue';
 definePageMeta({
   layout: 'logged-out'
 })
-const auth = useTemplateRef("auth");
 const showSun = ref(false)
 </script>
 
@@ -16,14 +15,15 @@ const showSun = ref(false)
 				<section id="description">
 					<p>All change starts from the bottom up. No matter your material circumstances, there are simple things you can do for yourself that make you more prepared to achieve difficult things. It's time to start becoming the person you want to be.</p>
 					<p>Set goals, track your progress, and invite friends to keep eachother accountable. Stop pushing that boulder up the hill; roll it down the other side!</p>
-					<button @click="() => showSun = true"><span class="metal raised">Chase the Rising Sun</span></button>
+		<ClientOnly>
+					<button @click="showSun = true"><span class="metal raised">Chase the Rising Sun</span></button>
+		</ClientOnly>
 				</section>
 				    <!-- <button @click="openInPopup('/auth/github')">Login with GitHub</button> -->
 				<img src="~/assets/sexysisyphus.png" alt="Sisyphus is vibing and sexy today chilling in the vaporwave sunset. He's got this." />
 			</div>
 		</article>
-		<Auth ref="auth" v-if="showSun"/>
-		<!-- <Auth /> -->
+			<Auth v-show="showSun"/>
 	</main>
 </template>
 

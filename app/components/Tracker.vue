@@ -10,18 +10,17 @@
 			<div v-for="habit in habits" :key="habit.name" class="habit">
 				<h3 class="glowy-text">{{ habit.name }}</h3>
 				<div v-for="date in listedDates" :key="date.toISOString()" class="habit-day">
-					<span v-if="habit.type === 'boolean'">
 						<input type="checkbox" v-model="habit.datesCompleted[date.toISOString()]"
-							:checked="habit.datesCompleted[date.toISOString()] || false" />
-					</span>
-					<span v-else-if="habit.type === 'duration'">
-						<input type="number" v-model.number="habit.datesCompleted[date.toISOString()]"
-							:placeholder="habit.goal" class="glassy"/>
-					</span>
-					<span v-else-if="habit.type === 'quantity'">
-						<input type="number" v-model.number="habit.datesCompleted[date.toISOString()]"
-							:placeholder="habit.goal" class="glassy"/>
-					</span>
+							:checked="habit.datesCompleted[date.toISOString()] || false"
+							@click="completeHabbit(habit)"/>
+						<span class="optional-quantity" v-if="habit.datesCompleted[date.toISOString()]">
+							<input type="number" v-model.number="habit.datesCompleted[date.toISOString()]"
+								:placeholder="habit.goal" class="glassy"
+								v-if="habit.type === 'duration'"/>
+							<input type="number" v-model.number="habit.datesCompleted[date.toISOString()]"
+								:placeholder="habit.goal" class="glassy"
+								v-else-if="habit.type === 'quantity'"/>
+						</span>
 				</div>
 			</div>
 		</div>
@@ -108,6 +107,12 @@
 		mounted() {
 			// console.log("Tracker component mounted");
 			// console.log(this.listedDayHeadings())
+		},
+		methods: {
+			completeHabbit(event, habit) {
+				const chk = event.target;
+				console.log("COMPLETED", habit);
+			}
 		}
 	}
 </script>
@@ -173,17 +178,18 @@
 	.habit {
 		display: contents;
 	}
+	.optional-quantity {
+		display: inline;
+	}
 	input[type="checkbox"] {
 		width: 20px;
 		height: 20px;
 		margin: 0 auto;
-		display: block;
 	}
 	input[type="number"] {
 		width: 80%;
 		background-color: transparent;
 		border: none;
-		display: block;
 		margin: 0 auto;
 		border-bottom: 2px solid hsl(var(--electro));
 		color: hsl(var(--electro));

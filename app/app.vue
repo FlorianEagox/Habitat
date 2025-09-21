@@ -30,7 +30,6 @@ export const authClient = createAuthClient({});
 		--purple: 261deg, 56%, 15%;
 		--night: 261deg, 89%, 7%;
 		--violet: 284deg, 80%, 20%;
-		
 		--sky-line: 7px;
 		--sun-size: 50vh;
 		--ground-size: 45vh;
@@ -99,7 +98,11 @@ export const authClient = createAuthClient({});
 		box-shadow: rgba(255,128,0,0.7) 0px 0 20px;
 		z-index: 0;
 	}
-	.glowy-text {
+	.sun > * {
+		position: relative;
+		z-index: 1; /* ensure content sits above the background */
+	}
+	.glowy-texti {
 		text-shadow: 0 0 5px hsla(var(--purple), 1);
 		color: hsl(var(--electro));
 	}
