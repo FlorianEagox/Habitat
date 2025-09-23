@@ -5,21 +5,23 @@
 		<div class="glowy-text" id="habbits-grid">
 			<div id="headings">
 				<span>Habbit</span>
-				<span class="day-heading" v-for="date in listedDayHeadings" :key="date" v-text="date" />
+				<span class="day-heading" v-for="date in listedDayHeadings" :key="date" v-text="date"></span>
 			</div>
 			<div v-for="habit in habits" :key="habit.name" class="habit">
 				<h3 class="glowy-text">{{ habit.name }}</h3>
 				<div v-for="date in listedDates" :key="date.toISOString()" class="habit-day">
-						<input type="checkbox" v-model="habit.datesCompleted[date.toISOString()]"
-							:checked="habit.datesCompleted[date.toISOString()] || false"
-							@click="completeHabbit(habit)"/>
+						<input type="checkbox"
+							v-model="habit.datesCompleted[date.toISOString()]"
+							@change="completeHabbit($event, habit, date.toISOString())"/>
 						<span class="optional-quantity" v-if="habit.datesCompleted[date.toISOString()]">
-							<input type="number" v-model.number="habit.datesCompleted[date.toISOString()]"
+							<input type="number" 
 								:placeholder="habit.goal" class="glassy"
-								v-if="habit.type === 'duration'"/>
-							<input type="number" v-model.number="habit.datesCompleted[date.toISOString()]"
+								v-if="habit.type === 'duration'"
+							/>
+							<input type="number" 
 								:placeholder="habit.goal" class="glassy"
-								v-else-if="habit.type === 'quantity'"/>
+								v-else-if="habit.type === 'quantity'"
+							/>
 						</span>
 				</div>
 			</div>
@@ -32,16 +34,16 @@
 		data() {
 			const today = new Date();
 			const daysToShow = 7;
-			let listedDates = Array.from({length: daysToShow}, (day, i) =>
-				new Date(new Date().setDate(today.getDate() - i)
-			)
-)
+			let listedDates = Array.from({length: daysToShow}, (_, i) =>
+  				new Date(new Date().setDate(today.getDate() - i))
+			);
+			const editableDates = Object.fromEntries(listedDates.map(d => [d.toISOString(), false]));
 			return {
 				habits: [
 					{
 						name: "Wake up time",
 						type: "duration",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 0.8,
 						goal: 8
@@ -49,7 +51,7 @@
 					{
 						name: "Play Piano",
 						type: "duration",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 0.5,
 						goal: 30
@@ -57,7 +59,7 @@
 					{
 						name: "Read Book",
 						type: "quantity",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 0.75,
 						goal: 100
@@ -65,7 +67,7 @@
 					{
 						name: "Exercise",
 						type: "duration",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 0.2,
 						goal: 60
@@ -73,7 +75,7 @@
 					{
 						name: "Meditate",
 						type: "duration",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 0.9,
 						goal: 15
@@ -81,14 +83,14 @@
 					{
 						name: "Take Medication",
 						type: "boolean",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 1,
 					},
 					{
 						name: "Journal",
 						type: "duration",
-						datesCompleted: [],
+						datesCompleted: {...editableDates},
 						completedToday: false,
 						degreeOfCompletion: 0.8,
 						goal: 20
@@ -109,15 +111,18 @@
 			// console.log(this.listedDayHeadings())
 		},
 		methods: {
-			completeHabbit(event, habit) {
+			completeHabbit(event, habit, completionDate) {
 				const chk = event.target;
-				console.log("COMPLETED", habit);
+				console.log(this.habits, habit, completionDate);
 			}
 		}
 	}
 </script>
 
-<style>
+<style scoped>
+ * {
+	border: 1px solid red;
+}
 	#tracker {
 		width: 900px;
 		height: 500px;
@@ -185,6 +190,8 @@
 		width: 20px;
 		height: 20px;
 		margin: 0 auto;
+		padding: 30px;
+		cursor: pointer;
 	}
 	input[type="number"] {
 		width: 80%;
