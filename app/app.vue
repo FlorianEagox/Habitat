@@ -106,6 +106,27 @@ export const authClient = createAuthClient({});
 		text-shadow: 0 0 5px hsla(var(--purple), 1);
 		color: hsl(var(--electro));
 	}
+	.glassy {
+		background: rgba(200, 200, 255, 0.4);
+		backdrop-filter: blur(10px) brightness(0.8);
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 25px;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	}
+	form button {
+		margin: 0.3em;
+		padding: 0.5em;
+		border: 3px dashed hsla(var(--electro), 0.9) !important;
+		/* // background: hsla(var(--electro), 0.2); */
+		margin: 0.25em;
+		color: inherit;
+		background: none;
+		text-shadow: inherit;
+		font-weight: bold;
+		grid-column: 2;
+		justify-self: center;
+		width: 70%;
+	}
 	li:hover,
 	.selected,
 	button:hover,

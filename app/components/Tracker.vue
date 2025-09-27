@@ -9,11 +9,11 @@
 			</div>
 			<div v-for="habit in habits" :key="habit.name" class="habit">
 				<h3 class="glowy-text">{{ habit.name }}</h3>
-				<div v-for="date in listedDates" :key="date.toISOString()" class="habit-day">
+				<div v-for="date in listedDates" :key="date.habit" class="habit-day">
 						<input type="checkbox"
-							v-model="habit.datesCompleted[date.toISOString()]"
-							@change="completeHabbit($event, habit, date.toISOString())"/>
-						<span class="optional-quantity" v-if="habit.datesCompleted[date.toISOString()]">
+							v-model="habit.datesCompleted[date.habit]"
+							@change="completeHabbit($event, habit, date.habit)"/>
+						<span class="optional-quantity" v-if="habit.datesCompleted[date.habit]">
 							<input type="number" 
 								:placeholder="habit.goal" class="glassy"
 								v-if="habit.type === 'duration'"
@@ -37,13 +37,12 @@
 			let listedDates = Array.from({length: daysToShow}, (_, i) =>
   				new Date(new Date().setDate(today.getDate() - i))
 			);
-			const editableDates = Object.fromEntries(listedDates.map(d => [d.toISOString(), false]));
 			return {
 				habits: [
 					{
 						name: "Wake up time",
 						type: "duration",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 0.8,
 						goal: 8
@@ -51,7 +50,7 @@
 					{
 						name: "Play Piano",
 						type: "duration",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 0.5,
 						goal: 30
@@ -59,7 +58,7 @@
 					{
 						name: "Read Book",
 						type: "quantity",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 0.75,
 						goal: 100
@@ -67,7 +66,7 @@
 					{
 						name: "Exercise",
 						type: "duration",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 0.2,
 						goal: 60
@@ -75,7 +74,7 @@
 					{
 						name: "Meditate",
 						type: "duration",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 0.9,
 						goal: 15
@@ -83,14 +82,14 @@
 					{
 						name: "Take Medication",
 						type: "boolean",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 1,
 					},
 					{
 						name: "Journal",
 						type: "duration",
-						datesCompleted: {...editableDates},
+						datesCompleted: {},
 						completedToday: false,
 						degreeOfCompletion: 0.8,
 						goal: 20
@@ -120,9 +119,6 @@
 </script>
 
 <style scoped>
- * {
-	border: 1px solid red;
-}
 	#tracker {
 		width: 900px;
 		height: 500px;
