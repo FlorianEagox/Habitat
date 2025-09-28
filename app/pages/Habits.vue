@@ -2,7 +2,7 @@
 	<div class="habits-page glassy glowy-text">
 		<h2 class="metal raised">Manage Your Habits</h2>
 		<hr>
-		<form class="habit-form" @submit.prevent="onSubmit">
+		<form class="habit-form" @submit.prevent="addHabit">
 			<label>
 				<span class="label-text">Habit Name</span>
 				<input v-model="form.name" class="glassy" placeholder="e.g. Take Walk" required />
@@ -38,7 +38,7 @@
 						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.goal }}</span>
 					</div>
 					<div class="habit-actions">
-						<button class="glassy" @click="startEdit(habit)">Edit</button>
+						<button class="glassy" @click="populateForm(habit)">Edit</button>
 						<button class="glassy danger" @click="removeHabit(habit._id)">Delete</button>
 					</div>
 				</li>
@@ -73,13 +73,6 @@ const form = reactive({
 
 const isEditing = ref(false)
 
-const sortedHabits = computed(() => {
-	return [...habits.value].sort((a, b) => {
-		if ((a.degreeOfCompletion || 0) === (b.degreeOfCompletion || 0)) return a.name.localeCompare(b.name)
-		return (a.degreeOfCompletion || 0) - (b.degreeOfCompletion || 0)
-	})
-})
-
 function resetForm() {
 	form._id = null
 	form.name = ''
@@ -88,7 +81,7 @@ function resetForm() {
 	isEditing.value = false
 }
 
-function onSubmit() {
+function addHabit() {
 	if (!form.name.trim()) return
 	if (isEditing.value && form._id != null) {
 		const idx = habits.value.findIndex(h => h._id === form._id)
@@ -101,6 +94,7 @@ function onSubmit() {
 		}
 	} else {
 		const id = Date.now()
+		
 		habits.value.push({
 			_id: id,
 			name: form.name.trim(),
@@ -114,11 +108,8 @@ function onSubmit() {
 	resetForm()
 }
 
-function startEdit(h) {
-	form._id = h._id
-	form.name = h.name
-	form.type = h.type
-	form.goal = h.goal
+function populateForm(h) {
+	Object.assign(form, h)
 	isEditing.value = true
 }
 

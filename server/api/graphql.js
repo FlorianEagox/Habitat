@@ -2,6 +2,8 @@
 import { typeDefs } from '#graphql/schema';
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateH3Handler } from '@as-integrations/h3';
+import { addHabit } from '../resolvers/habits';
+import { auth } from '../api/auth';
 
 const dummyUsers = [{
   id: "1234",
@@ -16,21 +18,15 @@ const resolvers = {
 		user: (_, {id}) => dummyUsers[id]
 	},
 	Mutation: {
-		register: (_, {username, email, password}) => {
-			let id = dummyUsers.length
-			dummyUsers.push({
-				id,
-				username,
-				email,
-				password
-			})
-			return dummyUsers[id]
-		}
+		addHabit: (_, habit, context) => addHabit(context.user, habit)
 	}
 };
 
 const apollo = new ApolloServer({typeDefs, resolvers});
 
 export default startServerAndCreateH3Handler(apollo, {
-	context: (event) => ({ event })
+	context: async event => {	
+		const session = await auth.api.getSession({headers: event.req.headers});
+		return { user: session?.user ?? null, event }
+	}
 })
