@@ -21,7 +21,7 @@
 			</label>
 			<label v-if="form.type == 'quantity'">
 				<span class="label-text">Unit</span>
-				<input type="number" placeholder="pages, laps" v-model.number="form.goal" min="1" class="glassy" />
+				<input placeholder="pages, laps" v-model="form.unit" min="1" class="glassy" />
 			</label>
 			<div class="actions">
 				<button class="glassy" type="submit">{{ isEditing ? 'Save' : 'Add Habit' }}</button>
@@ -31,7 +31,7 @@
 		<div class="habits-list">
 			<h3 class="metal">Current Habits</h3>
 			<ul>
-				<li v-for="habit in sortedHabits" :key="habit._id" class="habit-item glassy">
+				<li v-for="habit in habits" :key="habit.id" class="habit-item glassy">
 					<div class="habit-info">
 						<span class="habit-name">{{ habit.name }}</span>
 						<span class="habit-type">{{ habit.type }}</span>
@@ -43,7 +43,7 @@
 					</div>
 				</li>
 			</ul>
-			<p v-if="habits.length === 0" class="empty-text">No habits yet. Add one above!</p>
+			<p v-if="habits.length === 0" class="empty-text">No habits added yet. You're life, cast adift in the black sea, clinging to the splintering raft that is your crumbling foundation. <br> Add a habit above!</p>
 		</div>
 	</div>
 </template>
@@ -51,26 +51,16 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import { useState } from '#app'
+import { HabitTypes } from '#gql/default'
 
-const defaultHabits = [
-{ _id: 1, name: 'Wake up time', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
-{ _id: 2, name: 'Play Piano', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
-{ _id: 3, name: 'Read Book', type: 'quantity', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
-{ _id: 4, name: 'Exercise', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
-{ _id: 5, name: 'Meditate', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
-{ _id: 6, name: 'Take Medication', type: 'boolean', datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
-{ _id: 7, name: 'Journal', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
-]
-
-const habits = useState('habits', () => defaultHabits.map(h => ({ ...h })))
 
 const form = reactive({
 	_id: null,
 	name: '',
 	type: 'duration',
 	goal: null,
+	unit: null,
 })
-
 const isEditing = ref(false)
 
 function resetForm() {
@@ -81,32 +71,42 @@ function resetForm() {
 	isEditing.value = false
 }
 
-function addHabit() {
+async function addHabit() {
 	if (!form.name.trim()) return
-	if (isEditing.value && form._id != null) {
-		const idx = habits.value.findIndex(h => h._id === form._id)
-		if (idx === -1) return
-		habits.value[idx] = {
-			...habits.value[idx],
-			name: form.name.trim(),
-			type: form.type,
-			goal: form.type === 'boolean' ? undefined : form.goal,
-		}
-	} else {
-		const id = Date.now()
-		
-		habits.value.push({
-			_id: id,
-			name: form.name.trim(),
-			type: form.type,
-			goal: form.type === 'boolean' ? undefined : form.goal || null,
-			datesCompleted: {},
-			completedToday: false,
-			degreeOfCompletion: 0,
+	try {
+		// console.log("mrawrf", HabitTypes)
+		const { data, status } = await GqlAddHabit({
+			id: form._id,
+			name: form.name,
+			type: HabitTypes[form.type.toUpperCase()],
+			goal: form.goal,
+			unit: form.unit,
 		})
+		console.log(status, data)
+	} catch (error) {
+		console.error('Error adding/editing habit:', error)
+		return
 	}
-	resetForm()
+	// resetForm()
 }
+
+const dummyHabits = [
+{ _id: 1, name: 'Wake up time', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
+{ _id: 2, name: 'Play Piano', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
+{ _id: 3, name: 'Read Book', type: 'quantity', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
+{ _id: 4, name: 'Exercise', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
+{ _id: 5, name: 'Meditate', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
+{ _id: 6, name: 'Take Medication', type: 'boolean', datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
+{ _id: 7, name: 'Journal', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
+]
+
+const habits = useState('habits', () => [])
+const {data: fetchedHabits, status} = await useLazyAsyncData(
+	"gqlHabits",
+	() => GqlHabits().data.habits || [],
+	{watch: [habits], server: false}
+)
+// const currentHabits = computed(() => fetchedHabits.value || habits.value || dummyHabits)
 
 function populateForm(h) {
 	Object.assign(form, h)

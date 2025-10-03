@@ -8,27 +8,36 @@ type User {
 	habits: [Habit!]
 }
 
+enum HabitTypes {
+	QUANTITY
+	DURATION
+	BOOLEAN
+}
+
 type Habit {
 	id: ID!
-	name: String!
-	description: String
-	createdAt: String!
-	completedDates: [String!]!
 	owner: User!
+	name: String!
+	type: HabitTypes!
+	goal: Int!
+	unit: String
+	createdAt: String
+	completedDates: [Int!]
 }
+
 
 type Query {
 	me: User
 	user(id: ID!): User
 	users: [User!]!
 	habit(id: ID!): Habit
-	habits: [Habit!]!
+	habits(owner: ID): [Habit]
 }
 
 type Mutation {
 	register(username: String!, email: String!, password: String!): User
 	login(email: String!, password: String!): String
-	addHabit(name: String!, description: String): Habit
+	addHabit(id: ID, name: String!, type: HabitTypes!, goal: Int, unit: String): Habit
 	completeHabit(habitId: ID!, date: String!): Habit
 	addFriend(friendId: ID!): User
 }

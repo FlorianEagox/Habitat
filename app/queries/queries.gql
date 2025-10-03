@@ -1,23 +1,10 @@
-# Register a new user
-mutation register($username: String!, $email: String!, $password: String!) {
-  register(username: $username, email: $email, password: $password) {
-    id
-    username
-    email
-  }
-}
-
-# Login and get a token
-mutation login($email: String!, $password: String!) {
-  login(email: $email, password: $password)
-}
-
-# Add a new habit
-mutation addHabit($name: String!, $description: String) {
-  addHabit(name: $name, description: $description) {
+mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Int!, $unit: String) {
+  addHabit(id: $id, name: $name, type: $type, goal: $goal, unit: $unit) {
     id
     name
-    description
+    type
+    goal
+    unit
     createdAt
     completedDates
     owner {
@@ -98,7 +85,9 @@ query habit($id: ID!) {
   habit(id: $id) {
     id
     name
-    description
+    type
+    goal
+    unit
     createdAt
     completedDates
     owner {
@@ -109,11 +98,13 @@ query habit($id: ID!) {
 }
 
 # Get all habits
-query habits {
-  habits {
+query habits($owner: ID) {
+  habits(owner: $owner) {
     id
     name
-    description
+    type
+    goal
+    unit
     createdAt
     completedDates
     owner {

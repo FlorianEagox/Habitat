@@ -2,8 +2,9 @@
 import { typeDefs } from '#graphql/schema';
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateH3Handler } from '@as-integrations/h3';
-import { addHabit } from '../resolvers/habits';
-import { auth } from '../api/auth';
+import { getHeaders } from 'h3';
+import { addHabit, getHabits } from '../resolvers/habits';
+import { auth } from '../auth';
 
 const dummyUsers = [{
   id: "1234",
@@ -15,18 +16,22 @@ const dummyUsers = [{
 
 const resolvers = {
 	Query: {
-		user: (_, {id}) => dummyUsers[id]
+		user: (_, {id}) => dummyUsers[id],
+		habits: (_, __, context) => getHabits(context.user)
 	},
 	Mutation: {
-		addHabit: (_, habit, context) => addHabit(context.user, habit)
+		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)}
 	}
 };
 
 const apollo = new ApolloServer({typeDefs, resolvers});
-
+// const app = express();
+// app.use(morgan())
 export default startServerAndCreateH3Handler(apollo, {
-	context: async event => {	
-		const session = await auth.api.getSession({headers: event.req.headers});
-		return { user: session?.user ?? null, event }
+	context: async ({event}) => {
+		const headers = getHeaders(event);
+		const {user} = await auth.api.getSession({ headers });
+		return { user, event }
 	}
 })
+// apollo.ApplyMidleware({ app });
