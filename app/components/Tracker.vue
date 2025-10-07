@@ -7,115 +7,84 @@
 				<span>Habbit</span>
 				<span class="day-heading" v-for="date in listedDayHeadings" :key="date" v-text="date"></span>
 			</div>
-			<div v-for="habit in habits" :key="habit.name" class="habit">
+			<div v-for="habit in habits" :key="habit.name" class="habit" v-if="habits.length > 0">
 				<h3 class="glowy-text">{{ habit.name }}</h3>
-				<div v-for="date in listedDates" :key="date.habit" class="habit-day">
-						<input type="checkbox"
-							v-model="habit.datesCompleted[date.habit]"
-							@change="completeHabbit($event, habit, date.habit)"/>
-						<span class="optional-quantity" v-if="habit.datesCompleted[date.habit]">
-							<input type="number" 
-								:placeholder="habit.goal" class="glassy"
-								v-if="habit.type === 'duration'"
-							/>
-							<input type="number" 
-								:placeholder="habit.goal" class="glassy"
-								v-else-if="habit.type === 'quantity'"
-							/>
-						</span>
+				<div v-for="date in listedDates" :key="date.getTime()" class="habit-day">
+					<input type="checkbox"
+					@change="completeHabbit($event, habit, date.getTime())"
+					:checked="habit.datesCompleted[date.getTime()]"/>
+					<span class="optional-quantity" v-if="habit.datesCompleted[date.getTime()]">
+						<input type="time" 
+						:placeholder="habit.goal" class="glassy"
+						v-model="habit.datesCompleted[date.getTime()]"
+						v-if="habit.type === 'DURATION'"
+						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
+						/>
+						<input type="number" 
+						:placeholder="habit.goal" class="glassy"
+						v-model="habit.datesCompleted[date.getTime()]"
+						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
+						v-else-if="habit.type === 'QUANTITY'"
+						/>
+					</span>
 				</div>
 			</div>
+			<h3 v-else="" id="no-habits" class="glowy-text">
+				No habbits to track, add one from the <nuxt-link to="/habits">Habits Panel</nuxt-link>
+			</h3>
 		</div>
 	</div>
 </template>
 
-<script>
-	export default {
-		data() {
-			const today = new Date();
-			const daysToShow = 7;
-			let listedDates = Array.from({length: daysToShow}, (_, i) =>
-  				new Date(new Date().setDate(today.getDate() - i))
-			);
-			return {
-				habits: [
-					{
-						name: "Wake up time",
-						type: "duration",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 0.8,
-						goal: 8
-					},
-					{
-						name: "Play Piano",
-						type: "duration",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 0.5,
-						goal: 30
-					},
-					{
-						name: "Read Book",
-						type: "quantity",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 0.75,
-						goal: 100
-					},
-					{
-						name: "Exercise",
-						type: "duration",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 0.2,
-						goal: 60
-					},
-					{
-						name: "Meditate",
-						type: "duration",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 0.9,
-						goal: 15
-					},
-					{
-						name: "Take Medication",
-						type: "boolean",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 1,
-					},
-					{
-						name: "Journal",
-						type: "duration",
-						datesCompleted: {},
-						completedToday: false,
-						degreeOfCompletion: 0.8,
-						goal: 20
-					},
-				],
-				listedDates
-			};
-		},
-		computed: {
-			listedDayHeadings() {
-				return this.listedDates.map(date =>
-					date.toLocaleDateString('en-US', { weekday: 'short' })
-				);
-			}
-		},
-		mounted() {
-			// console.log("Tracker component mounted");
-			// console.log(this.listedDayHeadings())
-		},
-		methods: {
-			completeHabbit(event, habit, completionDate) {
-				const chk = event.target;
-				console.log(this.habits, habit, completionDate);
-			}
-		}
+<script setup>
+	import { ref, computed, onMounted } from 'vue'
+	import { useState } from '#app' // Nuxt composables
+// import { date } from 'better-auth'
+
+	// --- Data / refs ---
+	const today = new Date()
+	const daysToShow = 7
+	const listedDates = Array.from({ length: daysToShow }, (_, i) =>  {
+		const d =new Date(new Date().setDate(today.getDate() - i))
+		d.setUTCHours(0,0,0,0)
+		return d
 	}
+	)
+
+	const dummyHabits = [
+	{ name: "Wake up time", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
+	{ name: "Play Piano", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
+	{ name: "Read Book", type: "quantity", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
+	{ name: "Exercise", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
+	{ name: "Meditate", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
+	{ name: "Take Medication", type: "boolean", datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
+	{ name: "Journal", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
+	]
+
+	const habits = ref([])
+
+	const listedDayHeadings = computed(() => 
+		listedDates.map(date =>
+			date.toLocaleDateString('en-US', { weekday: 'short' })
+		)
+	)
+
+	function completeHabbit(event, habit, completionDate, degreeOfCompletion) {
+		const checked = event.target.checked
+		let val = checked
+		if(degreeOfCompletion)
+			val = degreeOfCompletion
+		else
+			habit.datesCompleted[completionDate] = val
+		console.log({degreeOfCompletion, val, checked})
+		// habit.datesCompleted = { ...habit.datesCompleted, [completionDate]: checked }
+		GqlCompleteHabit({habitId: habit.id, date: completionDate, degreeOfCompletion: val})
+	}
+
+	onMounted(async () => {
+		const fetchedHabits = (await GqlHabits()).habits
+		habits.value = fetchedHabits
+	})
 </script>
 
 <style scoped>
@@ -137,14 +106,14 @@
 		height: 100%;
 		background-image: linear-gradient(orange, gold, red, purple);
 		clip-path: polygon(
-  -50% 0%, 150% -20%, 150% 35%, -50% 35%,
-  -50% 42%, 150% 42%, 150% 50%, 0 50%,
-  -50% 55%, 150% 55%, 150% 60%, 0 60%,
-  -50% 62%, 150% 62%, 150% 65%, 0 65%,
-  -50% 67%, 150% 67%, 150% 70%, 0 70%,
-  -50% 72%, 150% 72%, 150% 75%, 0 75%,
-  -50% 76%, 150% 76%, 150% 150%, 0 150%
-);
+		-50% 0%, 150% -20%, 150% 35%, -50% 35%,
+		-50% 42%, 150% 42%, 150% 50%, 0 50%,
+		-50% 55%, 150% 55%, 150% 60%, 0 60%,
+		-50% 62%, 150% 62%, 150% 65%, 0 65%,
+		-50% 67%, 150% 67%, 150% 70%, 0 70%,
+		-50% 72%, 150% 72%, 150% 75%, 0 75%,
+		-50% 76%, 150% 76%, 150% 150%, 0 150%
+		);
 		border-radius: 25px;
 		box-shadow: rgba(255,128,0,0.7) 0px 0 20px;
 		z-index: 0;
@@ -176,8 +145,15 @@
 	h3 {
 		white-space: nowrap;
 	}
+	#no-habits {
+		grid-column: 1 / -1;
+		text-align: center;
+	}
 	.habit {
 		display: contents;
+	}
+	.habit-day {
+		display: flex;
 	}
 	.optional-quantity {
 		display: inline;

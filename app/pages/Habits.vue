@@ -10,16 +10,17 @@
 			<label>
 				<span class="label-text">Type</span>
 				<select v-model="form.type" class="glassy">
-					<option value="duration">Duration (minutes)</option>
-					<option value="quantity">Quantity</option>
-					<option value="boolean">Boolean</option>
+					<option value="DURATION">Duration (minutes)</option>
+					<option value="QUANTITY">Quantity</option>
+					<option value="BOOLEAN" selected="selected">Boolean</option>
 				</select>
 			</label>
-			<label v-if="form.type !== 'boolean'">
+			<label v-if="form.type !== 'BOOLEAN'">
 				<span class="label-text">Goal</span>
-				<input type="number" v-model.number="form.goal" min="1" class="glassy" />
+				<input v-if="form.type == 'QUANTITY'" type='number' v-model="form.goal" min="1" class="glassy" />
+				<input v-else type="time" v-model="form.goal" min="1" step="300" class="glassy" />
 			</label>
-			<label v-if="form.type == 'quantity'">
+			<label v-if="form.type == 'QUANTITY'">
 				<span class="label-text">Unit</span>
 				<input placeholder="pages, laps" v-model="form.unit" min="1" class="glassy" />
 			</label>
@@ -39,7 +40,7 @@
 					</div>
 					<div class="habit-actions">
 						<button class="glassy" @click="populateForm(habit)">Edit</button>
-						<button class="glassy danger" @click="removeHabit(habit._id)">Delete</button>
+						<button class="glassy danger" @click="removeHabit(habit.id)">Delete</button>
 					</div>
 				</li>
 			</ul>
@@ -57,7 +58,7 @@ import { HabitTypes } from '#gql/default'
 const form = reactive({
 	_id: null,
 	name: '',
-	type: 'duration',
+	type: 'BOOLEAN',
 	goal: null,
 	unit: null,
 })
@@ -75,19 +76,23 @@ async function addHabit() {
 	if (!form.name.trim()) return
 	try {
 		// console.log("mrawrf", HabitTypes)
+		let goal = form.goal
+		if(typeof goal == "string")
+			goal = parseFloat(form.goal.replace(':', '.'))
 		const { data, status } = await GqlAddHabit({
-			id: form._id,
+			id: form.id,
 			name: form.name,
 			type: HabitTypes[form.type.toUpperCase()],
-			goal: form.goal,
+			goal,
 			unit: form.unit,
 		})
 		console.log(status, data)
+		await refreshHabits();
+		resetForm()
 	} catch (error) {
 		console.error('Error adding/editing habit:', error)
 		return
 	}
-	// resetForm()
 }
 
 const dummyHabits = [
@@ -101,22 +106,24 @@ const dummyHabits = [
 ]
 
 const habits = useState('habits', () => [])
-const {data: fetchedHabits, status} = await useLazyAsyncData(
-	"gqlHabits",
-	() => GqlHabits().data.habits || [],
-	{watch: [habits], server: false}
-)
-// const currentHabits = computed(() => fetchedHabits.value || habits.value || dummyHabits)
+
+async function refreshHabits() {
+	habits.value = (await GqlHabits()).habits
+	habits.value = habits.value.filter(habit => habit.type == "DURATION")
+		.map(habit => ({...habit, goal: habit.goal.toFixed(2).replace('.', ':')})
+	)
+}
+
+onMounted(refreshHabits);
 
 function populateForm(h) {
 	Object.assign(form, h)
 	isEditing.value = true
 }
 
-function removeHabit(id) {
-	const idx = habits.value.findIndex(h => h._id === id)
-	if (idx !== -1) habits.value.splice(idx, 1)
-	if (isEditing.value && form._id === id) resetForm()
+async function removeHabit(id) {
+	await GqlDeleteHabit({id})
+	await refreshHabits()
 }
 </script>
 

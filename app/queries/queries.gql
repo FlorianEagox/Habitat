@@ -1,12 +1,26 @@
-mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Int!, $unit: String) {
-  addHabit(id: $id, name: $name, type: $type, goal: $goal, unit: $unit) {
+scalar JSON
+scalar BigInt
+scalar BoolOrFloat
+
+mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Float, $unit: String, $datesCompleted: JSON) {
+  addHabit(id: $id, name: $name, type: $type, goal: $goal, unit: $unit, datesCompleted: $datesCompleted) {
     id
     name
     type
     goal
     unit
     createdAt
-    completedDates
+    datesCompleted
+    owner {
+      id
+      username
+    }
+  }
+}
+mutation deleteHabit($id: ID) {
+  deleteHabit(id: $id) {
+    id
+    name
     owner {
       id
       username
@@ -15,13 +29,14 @@ mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Int!, $uni
 }
 
 # Complete a habit for a specific date
-mutation completeHabit($habitId: ID!, $date: String!) {
-  completeHabit(habitId: $habitId, date: $date) {
+mutation completeHabit($habitId: ID!, $date: BigInt!, $degreeOfCompletion: BoolOrFloat) {
+  completeHabit(habitId: $habitId, date: $date, degreeOfCompletion: $degreeOfCompletion) {
     id
     name
-    completedDates
+    datesCompleted
   }
 }
+
 
 # Add a friend by ID
 mutation addFriend($friendId: ID!) {
@@ -48,7 +63,7 @@ query me {
     habits {
       id
       name
-      completedDates
+      datesCompleted
     }
   }
 }
@@ -66,7 +81,7 @@ query user($id: ID!) {
     habits {
       id
       name
-      completedDates
+      datesCompleted
     }
   }
 }
@@ -89,7 +104,7 @@ query habit($id: ID!) {
     goal
     unit
     createdAt
-    completedDates
+    datesCompleted
     owner {
       id
       username
@@ -106,7 +121,7 @@ query habits($owner: ID) {
     goal
     unit
     createdAt
-    completedDates
+    datesCompleted
     owner {
       id
       username

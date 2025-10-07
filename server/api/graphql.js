@@ -3,7 +3,10 @@ import { typeDefs } from '#graphql/schema';
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateH3Handler } from '@as-integrations/h3';
 import { getHeaders } from 'h3';
-import { addHabit, getHabits } from '../resolvers/habits';
+
+import { getUser } from '../resolvers/users';
+import { addHabit, getHabits, completeHabit, deleteHabit } from '../resolvers/habits';
+
 import { auth } from '../auth';
 
 const dummyUsers = [{
@@ -16,12 +19,17 @@ const dummyUsers = [{
 
 const resolvers = {
 	Query: {
-		user: (_, {id}) => dummyUsers[id],
-		habits: (_, __, context) => getHabits(context.user)
+		user: (_, {id}) => getUser(id),
+		habits: (_, __, context) => getHabits(context.user),
 	},
 	Mutation: {
-		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)}
-	}
+		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
+		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(habitId, date, degreeOfCompletion),
+		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id)
+	},
+	Habit: {
+    	owner: (habit) => getUser(habit.owner) // <-- hydrate it here
+  	}
 };
 
 const apollo = new ApolloServer({typeDefs, resolvers});

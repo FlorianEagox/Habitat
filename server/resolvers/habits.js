@@ -1,6 +1,6 @@
+import { db, toPublic } from '../db';
 import monk from 'monk';
 
-const db = monk("mongodb://localhost/habitat");
 const habits = db.get('habits');
 
 export async function addHabit(user, habit) {
@@ -10,15 +10,12 @@ export async function addHabit(user, habit) {
 		owner: user.id,
 		createdAt: habit.id ? undefined : new Date(),
 		updatedAt: new Date(),
+		datesCompleted: habit.datesCompleted || {},
+		_id: habit.id ? habit.id : new monk.id(),
 	}
+	console.log({habit})
+	const query = {_id: newHabit._id};
 	delete newHabit.id;
-	let query = { owner: user.id };
-	if (habit.id != null) {
-		newHabit._id = habit.id;
-		query._id = habit.id;
-	}
-	
-	console.log({newHabit});
 	try {
 		const habitRecord = await habits.update(
 			query,
@@ -35,14 +32,34 @@ export async function addHabit(user, habit) {
 export async function getHabits(user) {
 	if (!user)
 		throw new Error('Not authenticated');
-	console.log("letsa go!")
 	try {
-		const foundHabits = (await (habits.find({ owner: user.id })))
-			.map(h => ({...h, id: h._id}));
-		console.log("AWOOO", {foundHabits});
-		return foundHabits || [];
+		return toPublic(await habits.find({ owner: user.id })) || [];
 	} catch (err) {
-		console.error("Error fetching habits", err);
+		console.error("AHHHH", err);
 		throw new Error('Error fetching habits');
 	}
+}
+
+export async function completeHabit(id, date, degreeOfCompletion) {
+	console.log("AAA", id, date, degreeOfCompletion)
+  // fetch the existing habit
+  const habit = await habits.findOne({ _id: id });
+  if (!habit) throw new Error('Habit not found');
+
+  // make sure datesCompleted exists
+  const datesCompleted = habit.datesCompleted || {};
+
+  // mark this date as completed
+  datesCompleted[date] = degreeOfCompletion;
+
+  // update in DB
+  await habits.update(
+    { _id: id },
+    { $set: { datesCompleted, updatedAt: new Date() } }
+  );
+  return {"Habit": { ...habit, id: habit.id, datesCompleted, updatedAt: new Date() }};
+}
+
+export function deleteHabit(user, habitId) {
+	return habits.findOneAndDelete({_id: habitId, owner: user.id})
 }
