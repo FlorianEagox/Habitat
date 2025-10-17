@@ -61,7 +61,11 @@ const splashTexts = [
 	"You're the poison and the antitode",
 	"That's my purse, Idk u!!!",
 	"u like jazz?",
-	"Streaking in the summertime"
+	"Streaking in the summertime",
+	"YOLO",
+	"You can do it, we can help",
+	"It gets easier, but ya gotta do it every day",
+	"It's not you, it's me"
 ];
 const splashText = computed(() => {
 	return splashTexts[Math.floor(Math.random() * splashTexts.length)];

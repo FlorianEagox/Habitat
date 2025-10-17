@@ -14,9 +14,10 @@
 					@change="completeHabbit($event, habit, date.getTime())"
 					:checked="habit.datesCompleted[date.getTime()]"/>
 					<span class="optional-quantity" v-if="habit.datesCompleted[date.getTime()]">
-						<input type="time" 
+						<input type="text" 
 						:placeholder="habit.goal" class="glassy"
 						v-model="habit.datesCompleted[date.getTime()]"
+						pattern="[0-9]{1,2}:[0-9]{2}"
 						v-if="habit.type === 'DURATION'"
 						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
 						/>
@@ -45,7 +46,7 @@
 	const today = new Date()
 	const daysToShow = 7
 	const listedDates = Array.from({ length: daysToShow }, (_, i) =>  {
-		const d =new Date(new Date().setDate(today.getDate() - i))
+		const d = new Date(new Date().setDate(today.getDate() - i))
 		d.setUTCHours(0,0,0,0)
 		return d
 	}
@@ -72,9 +73,11 @@
 	function completeHabbit(event, habit, completionDate, degreeOfCompletion) {
 		const checked = event.target.checked
 		let val = checked
-		if(degreeOfCompletion)
+		if(degreeOfCompletion) {
 			val = degreeOfCompletion
-		else
+			if(habit.type == "DURATION")
+				val = parseFloat(degreeOfCompletion.replace(':', '.'))
+		} else
 			habit.datesCompleted[completionDate] = val
 		console.log({degreeOfCompletion, val, checked})
 		// habit.datesCompleted = { ...habit.datesCompleted, [completionDate]: checked }
@@ -165,7 +168,9 @@
 		padding: 30px;
 		cursor: pointer;
 	}
-	input[type="number"] {
+	input[type="number"],
+	input[type="time"],
+	input[type="text"] {
 		width: 80%;
 		background-color: transparent;
 		border: none;
@@ -177,5 +182,12 @@
 		/* text-shadow: inherit; */
 		font-size: 1.2em;
 		text-shadow: 0 0 2px hsla(var(--purple), 1);
+	}
+	input[type="text"] {
+		width:100%;
+		font-size: 0.8em;
+	}
+	input[type=time]::-webkit-datetime-edit-ampm-field {
+		display: none;
 	}
 </style>

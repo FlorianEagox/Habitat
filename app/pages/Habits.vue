@@ -2,7 +2,7 @@
 	<div class="habits-page glassy glowy-text">
 		<h2 class="metal raised">Manage Your Habits</h2>
 		<hr>
-		<form class="habit-form" @submit.prevent="addHabit">
+		<form class="habit-form" @submit.prevent="addHabit" novalidate>
 			<label>
 				<span class="label-text">Habit Name</span>
 				<input v-model="form.name" class="glassy" placeholder="e.g. Take Walk" required />
@@ -10,7 +10,7 @@
 			<label>
 				<span class="label-text">Type</span>
 				<select v-model="form.type" class="glassy">
-					<option value="DURATION">Duration (minutes)</option>
+					<option value="DURATION">Duration/Time</option>
 					<option value="QUANTITY">Quantity</option>
 					<option value="BOOLEAN" selected="selected">Boolean</option>
 				</select>
@@ -18,7 +18,7 @@
 			<label v-if="form.type !== 'BOOLEAN'">
 				<span class="label-text">Goal</span>
 				<input v-if="form.type == 'QUANTITY'" type='number' v-model="form.goal" min="1" class="glassy" />
-				<input v-else type="time" v-model="form.goal" min="1" step="300" class="glassy" />
+				<input v-else type="text"  v-model="form.goal" step="300" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="HH:MM" class="glassy"/>
 			</label>
 			<label v-if="form.type == 'QUANTITY'">
 				<span class="label-text">Unit</span>
@@ -32,11 +32,11 @@
 		<div class="habits-list">
 			<h3 class="metal">Current Habits</h3>
 			<ul>
-				<li v-for="habit in habits" :key="habit.id" class="habit-item glassy">
+				<li v-for="habit in displayHabits" :key="habit.id" class="habit-item glassy">
 					<div class="habit-info">
 						<span class="habit-name">{{ habit.name }}</span>
 						<span class="habit-type">{{ habit.type }}</span>
-						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.goal }}</span>
+						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }}</span>
 					</div>
 					<div class="habit-actions">
 						<button class="glassy" @click="populateForm(habit)">Edit</button>
@@ -67,7 +67,7 @@ const isEditing = ref(false)
 function resetForm() {
 	form._id = null
 	form.name = ''
-	form.type = 'duration'
+	form.type = 'BOOLEAN'
 	form.goal = null
 	isEditing.value = false
 }
@@ -75,8 +75,8 @@ function resetForm() {
 async function addHabit() {
 	if (!form.name.trim()) return
 	try {
-		// console.log("mrawrf", HabitTypes)
 		let goal = form.goal
+		console.log(form.goal)
 		if(typeof goal == "string")
 			goal = parseFloat(form.goal.replace(':', '.'))
 		const { data, status } = await GqlAddHabit({
@@ -109,9 +109,6 @@ const habits = useState('habits', () => [])
 
 async function refreshHabits() {
 	habits.value = (await GqlHabits()).habits
-	habits.value = habits.value.filter(habit => habit.type == "DURATION")
-		.map(habit => ({...habit, goal: habit.goal.toFixed(2).replace('.', ':')})
-	)
 }
 
 onMounted(refreshHabits);
@@ -125,6 +122,15 @@ async function removeHabit(id) {
 	await GqlDeleteHabit({id})
 	await refreshHabits()
 }
+
+const displayHabits = computed(() =>
+	habits.value.map(habit => ({
+		...habit,
+		displayGoal: habit.type === "DURATION"
+			? habit.goal?.toFixed(2).replace('.', ':')
+			: habit.goal
+	}))
+)
 </script>
 
 <style scoped>
@@ -239,5 +245,9 @@ async function removeHabit(id) {
 	font-size: 1.1em;
 	text-align: center;
 	opacity: 0.7;
+}
+input[type=time]::-webkit-datetime-edit-ampm-field {
+	display: none;
+
 }
 </style>

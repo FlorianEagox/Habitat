@@ -4,28 +4,22 @@ import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateH3Handler } from '@as-integrations/h3';
 import { getHeaders } from 'h3';
 
-import { getUser } from '../resolvers/users';
+import { addFriend, getUser, searchUsers } from '../resolvers/users';
 import { addHabit, getHabits, completeHabit, deleteHabit } from '../resolvers/habits';
 
 import { auth } from '../auth';
 
-const dummyUsers = [{
-  id: "1234",
-  username: "testuser",
-  email: "test@example.com",
-  friends: [],
-  habits: []
-}];
-
 const resolvers = {
 	Query: {
-		user: (_, {id}) => getUser(id),
+		user: (_, {id}, context) => getUser(id || context.user.id),
 		habits: (_, __, context) => getHabits(context.user),
+		searchUsers: (_, {part}, context) => searchUsers(part)
 	},
 	Mutation: {
 		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
 		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(habitId, date, degreeOfCompletion),
-		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id)
+		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),
+		addFriend: (_, {friendId}, context) => addFriend(context.user.id, friendId)
 	},
 	Habit: {
     	owner: (habit) => getUser(habit.owner) // <-- hydrate it here

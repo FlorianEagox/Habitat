@@ -4,7 +4,7 @@
 			<ul class="glassy">
 				<li><nuxt-link to="/tracker" class="glowy-text" active-class="selected"><Icon name="hugeicons:notebook-02"/> Tracker</nuxt-link></li>
 				<li><nuxt-link to="/habits" class="glowy-text" active-class="selected"><Icon name="material-symbols:list-alt-check-outline-sharp"/> My Habits</nuxt-link></li>
-				<li><a href="#services" class="glowy-text"><Icon name="game-icons:three-friends"/> Friends</a></li>
+				<li><nuxt-link to="/friends" class="glowy-text" active-class="selected"><Icon name="game-icons:three-friends"/> Friends</nuxt-link></li>
 				<li><a href="#contact" class="glowy-text"><Icon name="material-symbols:insights"/> Insights</a></li>
 			</ul>
 		</nav>

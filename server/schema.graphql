@@ -8,6 +8,7 @@ type User {
 	email: String!
 	friends: [User!]
 	habits: [Habit!]
+	avatar: String
 }
 
 enum HabitTypes {
@@ -31,9 +32,10 @@ type Habit {
 type Query {
 	me: User
 	user(id: ID!): User
-	users: [User!]!
+	users(part: String): [User!]!
 	habit(id: ID!): Habit
 	habits(owner: ID): [Habit]
+	searchUsers(part: String): [User]
 }
 
 type Mutation {

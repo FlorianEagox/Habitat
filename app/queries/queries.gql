@@ -112,6 +112,14 @@ query habit($id: ID!) {
   }
 }
 
+query searchUsers($part: String) {
+  searchUsers(part: $part) {
+    id,
+    username,
+    avatar
+  }
+}
+
 # Get all habits
 query habits($owner: ID) {
   habits(owner: $owner) {

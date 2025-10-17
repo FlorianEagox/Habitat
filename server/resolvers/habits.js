@@ -35,14 +35,11 @@ export async function getHabits(user) {
 	try {
 		return toPublic(await habits.find({ owner: user.id })) || [];
 	} catch (err) {
-		console.error("AHHHH", err);
 		throw new Error('Error fetching habits');
 	}
 }
 
-export async function completeHabit(id, date, degreeOfCompletion) {
-	console.log("AAA", id, date, degreeOfCompletion)
-  // fetch the existing habit
+export async function completeHabit(id, date, degreeOfCompletion) {  // fetch the existing habit
   const habit = await habits.findOne({ _id: id });
   if (!habit) throw new Error('Habit not found');
 
@@ -60,6 +57,6 @@ export async function completeHabit(id, date, degreeOfCompletion) {
   return {"Habit": { ...habit, id: habit.id, datesCompleted, updatedAt: new Date() }};
 }
 
-export function deleteHabit(user, habitId) {
-	return habits.findOneAndDelete({_id: habitId, owner: user.id})
+export async function deleteHabit(user, habitId) {
+	return {'Habit': toPublic(await habits.findOneAndDelete({_id: habitId, owner: user.id}))}
 }
