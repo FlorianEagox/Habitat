@@ -1,8 +1,11 @@
 <script setup>
 import { ref, onMounted, useTemplateRef } from 'vue';
+import { useRoute } from 'vue-router';
 import { authClient } from '../app.vue'
+
 const tab = ref('register');
 
+const token = useRoute().query?.token || null
 // refs for registration
 const txtUsername = ref(null);
 const registerUsername = ref('');
@@ -11,6 +14,7 @@ const registerPassword = ref('');
 
 const loginUser = ref('');
 const loginPassword = ref('');
+const newPassword = ref('');
 
 const fuckies = ref('');
 
@@ -30,10 +34,17 @@ async function handleLogin(e) {
 	const {data, error} = await authClient.signIn.email(
 		{ email: loginUser.value, password: loginPassword.value }, 
 		{ 
-			onSuccess: () => navigateTo('/tracker'), 
+			onSuccess: () => fuckies.value = "Password Reset, Don't loose it again, or do, i don't care, i mean I programmed this whole flow just in case you started showing signs of dementia, so I care a little bit I guess?",
 			onError: (ctx) => fuckies.value = ctx.error.message
 		}
 	);
+}
+async function passwordReset(e) {
+	e.preventDefault()
+	await authClient.resetPassword({newPassword: newPassword.value, token}, {
+		onSuccess: ctx => console.log("aaaa", ctx.data),
+		onError: ctx => fuckies.value = ctx.error.message
+	})
 }
 onMounted(() => {
 	txtUsername.value.focus()
@@ -65,7 +76,12 @@ onMounted(() => {
 			<label for="loginPassword">Password:</label>
 			<input type="password" id="loginPassword" class="glassy"  v-model="loginPassword" required />
 			<button class="glassy" @click="handleLogin">Letsa go</button>
-			<a href="#">Forgot username/password?</a>
+			<a @click="authClient.requestPasswordReset({email: loginUser, redirectTo: $route.fullPath})">Forgot username/password?</a>
+		</form>
+		<form v-if="$route.query.token" id="reset" action="">
+			<label for="resetPassword">New Password:</label>
+			<input type="password" id="resetPassword" class="glassy" v-model="newPassword" required />
+			<button class="glassy" @click="passwordReset">Reset Password</button>
 		</form>
 		<div id="fuckies" v-if="fuckies">Oopsie Poopsie: <span class="error-text" v-text="fuckies" /></div>
 	</div>

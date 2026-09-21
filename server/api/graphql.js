@@ -19,11 +19,21 @@ const resolvers = {
 		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
 		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(habitId, date, degreeOfCompletion),
 		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),
-		addFriend: (_, {friendId}, context) => addFriend(context.user.id, friendId)
+		addFriend: (_, {friendId, status}, context) => addFriend(context.user.id, friendId, status)
 	},
 	Habit: {
     	owner: (habit) => getUser(habit.owner) // <-- hydrate it here
-  	}
+  	},
+	User: {
+		friends: (parent) => {
+			console.log("a", parent.friends)
+			if(!parent.friends) return [];
+			return Object.entries(parent.friends).map(([id, status]) => ({
+				user: getUser(id),
+				status: status.status
+			}));
+		}
+	}
 };
 
 const apollo = new ApolloServer({typeDefs, resolvers});

@@ -2,11 +2,24 @@ scalar JSON
 scalar BigInt
 scalar BoolOrFloat
 
+enum FriendRequestStatus {
+	ACCEPTED
+	PENDING
+	SENT
+	BLOCKED
+}
+
+type FriendStatus {
+	user: User!
+	status: FriendRequestStatus!
+	sharedHabits: [Habit!]
+}
+
 type User {
 	id: ID!
 	username: String!
 	email: String!
-	friends: [User!]
+	friends: [FriendStatus!]
 	habits: [Habit!]
 	avatar: String
 }
@@ -44,6 +57,6 @@ type Mutation {
 	addHabit(id: ID, name: String!, type: HabitTypes!, goal: Float, unit: String, datesCompleted: JSON): Habit
 	deleteHabit(id: ID): Habit
 	completeHabit(habitId: ID!, date: BigInt!, degreeOfCompletion: BoolOrFloat): Habit
-	addFriend(friendId: ID!): User
+	addFriend(friendId: ID!, status: FriendRequestStatus!): User
 }
 

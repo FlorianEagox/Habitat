@@ -5,7 +5,8 @@ export default defineNuxtConfig({
 	devtools: { enabled: true },
 	// set the host to the a domain
 	devServer: {
-		host: 'tessapainter.com',
+		host: 'localhost',
+		port: 8848
 	},
 	modules: [
 		'@nuxt/fonts',
@@ -23,13 +24,18 @@ export default defineNuxtConfig({
 		},
 		clients: {
 			default: {
-				host: 'http://tessapainter.com:3000/api/graphql',
+				host: 'https://habitat.tessapainter.com/api/graphql',
 				schema: '../server/schema.graphql',
 			}
 		}
 	},
 	runtimeConfig: {
 		public: {
+		}
+	},
+	vite: {
+		server: {
+			allowedHosts: ["habitat.tessapainter.com"]
 		}
 	}
 })

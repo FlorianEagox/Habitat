@@ -19,14 +19,14 @@ export async function addHabit(user, habit) {
 	try {
 		const habitRecord = await habits.update(
 			query,
-			{$set: newHabit },
+			{  $set: newHabit },
 			{ upsert: true }
 		);
 		return newHabit;
 	} catch (err) {
 		console.error("AHHHH", err);
 		throw new Error('Error adding habit');
-	}	
+	}
 }
 
 export async function getHabits(user) {

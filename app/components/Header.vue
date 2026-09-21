@@ -51,7 +51,6 @@ const splashTexts = [
 	"Your future self will thank you",
 	"Make it count",
 	"It is what it is",
-	"It gets easier",
 	"I'm not depressed, you're depressed!",
 	"WTF is Minecraft?",
 	"Thinking of you",
@@ -65,7 +64,11 @@ const splashTexts = [
 	"YOLO",
 	"You can do it, we can help",
 	"It gets easier, but ya gotta do it every day",
-	"It's not you, it's me"
+	"It's not you, it's me",
+	"It's dangerous to go alone, take this!",
+	"Marco? Polo!",
+	"#VapeNation",
+	"Go Piss, Girl!"
 ];
 const splashText = computed(() => {
 	return splashTexts[Math.floor(Math.random() * splashTexts.length)];

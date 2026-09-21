@@ -10,30 +10,32 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@apollo/server": "^5.0.0",
-    "@as-integrations/h3": "^2.0.0",
+    "@apollo/server": "^5.5.1",
+    "@as-integrations/h3": "^2.0.3",
+    "@better-auth/infra": "^0.4.9",
     "@nuxt/eslint": "1.9.0",
     "@nuxt/fonts": "0.11.4",
     "@nuxt/icon": "2.0.0",
     "apollo": "^2.34.0",
     "apollo-server-express": "^3.13.0",
-    "bcryptjs": "^3.0.2",
-    "better-auth": "^1.3.7",
-    "eslint": "^9.0.0",
-    "graphql": "^16.11.0",
+    "bcryptjs": "^3.0.3",
+    "better-auth": "^1.7.5",
+    "eslint": "^9.39.5",
+    "graphql": "^16.14.2",
     "graphql-subscriptions": "^3.0.0",
-    "graphql-ws": "^6.0.6",
-    "mongodb": "^6.19.0",
+    "graphql-ws": "^6.2.2",
+    "mongodb": "^6.21.0",
     "monk": "^7.3.4",
-    "morgan": "^1.10.1",
-    "nuxt": "^4.0.3",
+    "morgan": "^1.12.1",
+    "nuxt": "^4.5.2",
     "nuxt-auth-utils": "0.5.23",
     "nuxt-graphql-client": "0.2.46",
-    "nuxt-graphql-server": "^3.1.5",
-    "vue": "^3.5.18",
-    "vue-router": "^4.5.1"
+    "nuxt-graphql-server": "^3.1.6",
+    "resend": "^6.28.1",
+    "vue": "^3.5.43",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "sass": "^1.91.0"
+    "sass": "^1.104.1"
   }
 }

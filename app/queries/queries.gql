@@ -39,13 +39,15 @@ mutation completeHabit($habitId: ID!, $date: BigInt!, $degreeOfCompletion: BoolO
 
 
 # Add a friend by ID
-mutation addFriend($friendId: ID!) {
-  addFriend(friendId: $friendId) {
+mutation addFriend($friendId: ID!, $status: FriendRequestStatus!) {
+  addFriend(friendId: $friendId, status: $status) {
     id
     username
     friends {
-      id
-      username
+      user {
+        username
+      }
+      status
     }
   }
 }
@@ -57,8 +59,11 @@ query me {
     username
     email
     friends {
-      id
-      username
+      user {
+        id
+        username
+      }
+      status
     }
     habits {
       id
@@ -75,8 +80,11 @@ query user($id: ID!) {
     username
     email
     friends {
-      id
-      username
+      user {
+        id
+        username
+      }
+      status
     }
     habits {
       id
