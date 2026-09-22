@@ -1,6 +1,7 @@
 <script setup>
 import { router } from 'better-auth/api';
 import { authClient } from '~/app.vue';
+import defaultAvatar from '~/assets/sexysisyphus2.png'  
 const userId = (await authClient.useSession(useFetch)).data.value.user.id
 const userInfo = (await GqlUser({id: userId})).user
 const friends = userInfo.friends
@@ -22,14 +23,17 @@ async function acceptFriendRequest(event, friendId) {
 <template>
     <div id="friends" class="glassy">
         <h2 class="metal">Friends</h2>
-        <div id="friend-search">
+        <div id="friend-search" class="habit-form">
             <h3>Find a Friend</h3>
-            <input type="text" id="txt-add-friend" class="glassy" v-model="queryName" @change="searchFriends">
+            <input type="text" id="txt-add-friend" class="glassy" v-model="queryName" @keypress="searchFriends" placeholder="tessa">
             <ul id="found-friends">
                 <li v-for="friend in foundFriends" :key="friend.id">
-                    <img :src="friend.avatar || 'https://png.pngtree.com/png-clipart/20210912/ourmid/pngtree-mysterious-female-silhouette-png-image_3917003.jpg'">
+                    <img :src="friend.avatar || defaultAvatar" />
                     <h3 v-text="friend.username" />
-                    <button @click="sendFriendRequest($event, friend.id)"><Icon name="material-symbols:add-reaction-outline"/>Add Friend</button>
+                    <button class="action-button" @click="sendFriendRequest($event, friend.id)">
+                        <Icon name="material-symbols:add-reaction-outline"/>
+                        Add Friend
+                    </button>
                 </li>
             </ul>
             <hr>
@@ -41,8 +45,8 @@ async function acceptFriendRequest(event, friendId) {
             <h3>Your Friends</h3>
             <li class="friend" v-for="friend in friends">
                <h3 v-text="friend.user.username"/>
-               <button class="btn-accept-friend" v-if="friend.status == 'PENDING'" @click="acceptFriendRequest($event, friend.user.id)">Accept</button>
-               <button class="btn-view-graph" v-else-if="friend.status == 'ACCEPTED'" @click="navigateTo({path: '/tracker', query: {friend: friend.user.id}})">View Habits</button>
+               <button id="btn-accept-friend" class="action-button glassy" v-if="friend.status == 'PENDING'" @click="acceptFriendRequest($event, friend.user.id)">Accept</button>
+               <button id="btn-view-graph" class="action-button glassy" v-else-if="friend.status == 'ACCEPTED'" @click="navigateTo({path: '/tracker', query: {friendId: friend.user.id}})">View Habits</button>
                <p class="friend-pending" v-else>Awaiting Friend Request</p>
             </li>
         </ul>
@@ -60,8 +64,29 @@ async function acceptFriendRequest(event, friendId) {
     #txt-add-friend {
         width: 100%;
     }
+    #found-friends, hr {
+        width: 100%;
+        margin: auto;
+        grid-column: 1/-1;
+    }
     #friends li {
+        padding: 1em;
+        background: none;
         display: flex;
+        margin: 0.5em auto;
+        align-items: center;
         justify-content: space-around;
+    }
+
+    #friends img {
+        max-width: 90px;
+        max-height: 90px;
+        border-radius: 30px;
+    }
+    @media (max-width: 768px) {
+        #friends {
+            width: 80%;
+            margin: auto;
+        }
     }
 </style>

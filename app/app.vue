@@ -8,6 +8,7 @@ export const authClient = createAuthClient({});
 <template>
 	<div>
 		<NuxtRouteAnnouncer />
+		<NuxtPwaManifest />
 		<NuxtLayout>
 			<NuxtPage />
 		</NuxtLayout>
@@ -70,6 +71,8 @@ export const authClient = createAuthClient({});
 		/* z-index: -2; */
 	}
 	.sun {
+	    will-change: transform, opacity;
+    	transform: translateZ(0); 
 		position: relative;
 		color: hsl(var(--electro));
 		border-radius: 25px;
@@ -102,7 +105,7 @@ export const authClient = createAuthClient({});
 		position: relative;
 		z-index: 1; /* ensure content sits above the background */
 	}
-	.glowy-texti {
+	.glowy-text {
 		text-shadow: 0 0 5px hsla(var(--purple), 1);
 		color: hsl(var(--electro));
 	}

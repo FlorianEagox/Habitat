@@ -16,6 +16,7 @@ export default defineNuxtConfig({
 		'nuxt-graphql-client',
 		'nuxt-graphql-server',
 		'nuxt-auth-utils',
+		'@vite-pwa/nuxt'
 	],
 	"graphql-client": {
 		codegen: {
@@ -36,6 +37,21 @@ export default defineNuxtConfig({
 	vite: {
 		server: {
 			allowedHosts: ["habitat.tessapainter.com"]
+		}
+	},
+	pwa: {
+		registerType: 'autoUpdate',
+		manifest: {
+			name: 'Habitat',
+			theme_color: '#bb0bb',
+			icons: [{
+				src: 'assets/sisyphus.png',
+				type: 'image/png'
+			}]
+		},
+		devOptions: {
+			enabled: true,
+			type: "module"
 		}
 	}
 })

@@ -1,6 +1,6 @@
 <template>
 	<div id="tracker" class="raise">
-		<h2 class="metal raised">
+		<h2 class="metal">
 			<span v-text="friend?.username ? `${friend.username}'s` : 'My'"/> Habits
 		</h2>
 		<hr>
@@ -13,22 +13,24 @@
 				<h3 class="glowy-text">{{ habit.name }}</h3>
 				<div v-for="date in listedDates" :key="date.getTime()" class="habit-day">
 					<input type="checkbox"
-					@change="completeHabbit($event, habit, date.getTime())"
-					:checked="habit.datesCompleted[date.getTime()]"
+					@change="completeHabit($event, habit, date.getTime())"
+					:checked="date.getTime() in habit.datesCompleted"
 					:disabled="props.friendId"/>
-					<span class="optional-quantity" v-if="habit.datesCompleted[date.getTime()]">
+					<span class="optional-quantity" v-if="date.getTime() in habit.datesCompleted">
 						<input type="text" 
-						:placeholder="habit.goal" class="glassy"
-						v-model="habit.datesCompleted[date.getTime()]"
-						pattern="[0-9]{1,2}:[0-9]{2}"
+						class="glassy"
+						:placeholder="formatFloatToDuration(habit.goal)"
+						:value="formatFloatToDuration(habit.datesCompleted[date.getTime()])"
+						pattern="[0-9]{1,3}:[0-9]{2}"
+						title="Hours:Minutes (e.g., 1:30)"
 						v-if="habit.type === 'DURATION'"
-						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
+						@change="completeHabit($event, habit, date.getTime(), $event.target.value)"
 						:readonly="props.friendId"
 						/>
 						<input type="number" 
 						:placeholder="habit.goal" class="glassy"
 						v-model="habit.datesCompleted[date.getTime()]"
-						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
+						@change="completeHabit($event, habit, date.getTime(), $event.target.value)"
 						v-else-if="habit.type === 'QUANTITY'"
 						:readonly="props.friendId"
 						>
@@ -76,19 +78,35 @@
 		)
 	)
 
-	function completeHabbit(event, habit, completionDate, degreeOfCompletion) {
+	async function completeHabit(event, habit, completionDate, degreeOfCompletion) {
 		const checked = event.target.checked
 		let val = checked
-		if(degreeOfCompletion) {
+ 
+		if (degreeOfCompletion !== undefined) {
 			val = degreeOfCompletion
-			if(habit.type == "DURATION")
-				val = parseFloat(degreeOfCompletion.replace(':', '.'))
-		} else
+			if (habit.type === "DURATION")
+				val = parseDurationToFloat(degreeOfCompletion)
+			else if (habit.type === "QUANTITY")
+				val = degreeOfCompletion === "" ? "" : parseFloat(degreeOfCompletion)
 			habit.datesCompleted[completionDate] = val
-		console.log({degreeOfCompletion, val, checked})
-		// habit.datesCompleted = { ...habit.datesCompleted, [completionDate]: checked }
-		GqlCompleteHabit({habitId: habit.id, date: completionDate, degreeOfCompletion: val})
+		} else if (checked) {
+			val = ""
+			habit.datesCompleted[completionDate] = val
+		} else {
+			delete habit.datesCompleted[completionDate]
+			val = null
+		}
+ 
+		try {
+			await GqlCompleteHabit({ habitId: habit.id, date: completionDate, degreeOfCompletion: val })
+		} catch (err) {
+			console.error('Failed to save habit completion', err)
+			// roll back the optimistic update so the UI matches what's actually saved
+			if (checked) delete habit.datesCompleted[completionDate]
+			else habit.datesCompleted[completionDate] = ''
+		}
 	}
+
 
 	async function hydrateHabitData() {
 		const fetchedHabits = (await GqlHabits({owner: props?.friendId}))
@@ -98,6 +116,29 @@
 		else {
 			friend.value = {}
 		}
+	}
+
+	function formatFloatToDuration(value) {
+		if (value === undefined || value === null || value === '' || value === false) return '';
+		
+		const totalMinutes = Math.round(parseFloat(value) * 60);
+		const hours = Math.floor(totalMinutes / 60);
+		const minutes = totalMinutes % 60;
+		
+		// Pad minutes with a leading zero (e.g., "05")
+		return `${hours}:${minutes.toString().padStart(2, '0')}`;
+	}
+
+	// Converts a user UI string like "1:30" into a database float 1.5
+	function parseDurationToFloat(stringValue) {
+		if (!stringValue || !stringValue.includes(':')) return 0;
+		
+		const [hoursStr, minutesStr] = stringValue.split(':');
+		const hours = parseInt(hoursStr, 10) || 0;
+		const minutes = parseInt(minutesStr, 10) || 0;
+		
+		// Convert minute fraction to decimal hours cleanly (e.g., 30 mins / 60 = 0.5)
+		return parseFloat((hours + minutes / 60).toFixed(2));
 	}
 
 	onMounted(async () => {
@@ -151,14 +192,15 @@
 	}
 	#habits-grid {
 		display: grid;
-		grid-template-columns: 1.4fr repeat(7, 1fr);
+		grid-template-columns: auto repeat(7, 1fr);
 		grid-template-rows: auto;
 		gap: 15px;
 		row-gap: 25px;
 		padding: 20px;
 		/* make elements be in center of grid cells */
-		/* justify-items: center; */
+		justify-items: center;
 		align-items: center;
+		
 	}
 	#headings {
 		font-weight: bold;
@@ -183,6 +225,7 @@
 	}
 	.optional-quantity {
 		display: inline;
+		min-width: 0;
 	}
 	input[type="checkbox"] {
 		width: 20px;
@@ -191,7 +234,7 @@
 		padding: 30px;
 		cursor: pointer;
 	}
-	input[type="checkbox"].disabled {
+	input[type="checkbox"]:disabled {
 		pointer-events: none; /* Prevents mouse clicks entirely */
 	}
 	input[type="number"],
@@ -208,12 +251,37 @@
 		/* text-shadow: inherit; */
 		font-size: 1.2em;
 		text-shadow: 0 0 2px hsla(var(--purple), 1);
+		min-width: 45px;
 	}
 	input[type="text"] {
 		width:100%;
 		font-size: 0.8em;
 	}
-	input[type=time]::-webkit-datetime-edit-ampm-field {
-		display: none;
+	input:read-only {
+		flex: 1 0 auto;
+		width: 100%;
+	}
+	@media (max-width: 768px) {
+		#tracker {
+			width: 90%;
+			max-height: 70vh;
+			margin: auto;
+		}
+		#habits-grid {
+			padding: 10px;
+			gap: 8px;
+		}
+		#headings {
+			font-weight: initial;
+		}
+		h3 {
+			white-space: initial;
+		}
+		.habit-day {
+			display: block;
+		}
+		.habit-day > * {
+			display: block;
+		}
 	}
 </style>

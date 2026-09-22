@@ -39,8 +39,14 @@
 						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }}</span>
 					</div>
 					<div class="habit-actions">
-						<button class="glassy" @click="populateForm(habit)">Edit</button>
-						<button class="glassy danger" @click="removeHabit(habit.id)">Delete</button>
+						<button class="action-button glassy" @click="populateForm(habit)">
+							<Icon name="material-symbols:box-edit-outline"/>
+							Edit
+						</button>
+						<button class="glassy action-button danger" @click="removeHabit(habit.id)">
+							<Icon name="material-symbols:delete-outline"/>
+							Delete
+						</button>
 					</div>
 				</li>
 			</ul>
@@ -133,7 +139,7 @@ const displayHabits = computed(() =>
 )
 </script>
 
-<style scoped>
+<style>
 .habits-page {
 	margin: 2em auto;
 	padding: 2em;
@@ -221,24 +227,7 @@ const displayHabits = computed(() =>
 	display: flex;
 	gap: 0.7em;
 }
-.habit-actions .glassy {
-	padding: 0.4em 1em;
-	border-radius: 8px;
-	font-weight: bold;
-	background: none;
-	border: 2px dashed hsla(var(--electro), 0.7);
-	color: hsl(var(--citrus));
-	cursor: pointer;
-	transition: background 0.2s, color 0.2s;
-}
-.habit-actions .danger {
-	border-color: hsl(var(--sanguine));
-	color: hsl(var(--sanguine));
-}
-.habit-actions .glassy:hover {
-	background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
-	color: hsl(var(--citrus));
-}
+
 .empty-text {
 	margin-top: 2em;
 	color: hsl(var(--electro));
@@ -249,5 +238,33 @@ const displayHabits = computed(() =>
 input[type=time]::-webkit-datetime-edit-ampm-field {
 	display: none;
 
+}
+
+@media (max-width: 768px) {
+	.habits-page {
+		padding: 0.5em;
+		width: 90%;
+	}
+	.habit-form {
+		min-width: 0;
+		max-width: 100%;
+		font-size: 0.9rem;
+		margin-top: 1em;
+	}
+	.habit-form input, .habit-form label, button {
+		width: 90%;
+		box-sizing: border-box;
+		font-size: 0.8rem;
+	}
+	.habit-item {
+		padding: 0.3em;
+	}
+	.habit-actions {
+		display: block;
+		flex-basis: 20%;
+	}
+	.habit-actions button {
+		white-space: nowrap;
+	}
 }
 </style>

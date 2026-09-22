@@ -15,7 +15,10 @@
 		</nav> -->
 		<div v-if="session.data" id="user" class="glassy">
 			<span>{{ session.data.user.name }}</span>
-			<button id="logout" @click="triggerLogout">Log Out</button>
+			<button id="logout" @click="triggerLogout">
+				<Icon name="material-symbols:power-settings-circle-rounded" />
+				Log Out
+			</button>
 		</div>
 	</header>
 </template>
@@ -75,7 +78,8 @@ const splashText = computed(() => {
 });
 function triggerLogout() {
 	authClient.signOut({fetchOptions: {
-		onSuccess: () => navigateTo('/')
+		onSuccess: () => navigateTo('/'),
+		onError: console.log
 	}})
 }
 const session = authClient.useSession();
@@ -174,6 +178,57 @@ const session = authClient.useSession();
 	}
 	#logout:hover {
 		background: linear-gradient(-180deg, red, hsl(var(--purple)));
-
+	}
+	@media (max-width: 768px) {
+		#splash-text {
+			top: 10px;
+			right: -35px;
+			z-index: 2;
+			font-size: 1rem;
+			transform: rotate(20deg);
+		}
+		h1 {
+			font-size: 2.9rem;
+		}
+		img {
+			max-width: 70px;
+		}
+		#user {
+			position: fixed;
+			top: 0.5em;
+			right: 0.5em;
+			left: auto;
+			z-index: 2;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.5em;
+			padding: 0.3em 0.5em;
+			border-radius: 15px;
+			box-shadow: 0 0 10px hsla(var(--electro), 0.5);
+		}
+		#user span {
+			font-size: 0.6rem;
+			white-space: nowrap;
+			overflow: hidden;
+			max-width: 10vw;
+		}
+		#logout {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.3em;
+			padding: 0.4em 0.6em;
+			border-radius: 26px;
+			border: 2px solid hsla(var(--electro));
+			box-shadow: 0 0 10px hsla(var(--electro), 0.5);
+			background: none;
+			color: hsl(var(--electro));
+			font-size: 0.6rem;
+			white-space: nowrap;
+		}
+		#logout:hover {
+			background-color: hsla(var(--electro), 0.1);
+		}
 	}
 </style>

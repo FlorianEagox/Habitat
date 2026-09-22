@@ -44,23 +44,25 @@ export async function getHabits(user, friendId) {
 	}
 }
 
-export async function completeHabit(userId, id, date, degreeOfCompletion) {  // fetch the existing habit
+export async function completeHabit(userId, id, date, degreeOfCompletion) {
   const habit = await habits.findOne({ _id: id });
   if (!habit) throw new Error('Habit not found');
+  if (habit.owner != userId) throw new Error("That's not your habit");
 
-  if (habit.owner != userId) throw new Error("That's not your habit")
-  // make sure datesCompleted exists
   const datesCompleted = habit.datesCompleted || {};
 
-  // mark this date as completed
-  datesCompleted[date] = degreeOfCompletion;
-
-  // update in DB
-  await habits.update(
+  if (degreeOfCompletion === null || degreeOfCompletion === false || degreeOfCompletion === undefined)
+    delete datesCompleted[date];
+  else
+    datesCompleted[date] = degreeOfCompletion;
+  
+  const updatedHabit = await habits.findOneAndUpdate(
     { _id: id },
-    { $set: { datesCompleted, updatedAt: new Date() } }
+    { $set: { datesCompleted, updatedAt: new Date() } },
+    { returnOriginal: false }
   );
-  return {"Habit": { ...habit, id: habit.id, datesCompleted, updatedAt: new Date() }};
+  
+  return toPublic(updatedHabit);
 }
 
 export async function deleteHabit(user, habitId) {

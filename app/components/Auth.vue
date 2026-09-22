@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, useTemplateRef } from 'vue';
+import { ref, onMounted, useTemplateRef, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import { authClient } from '../app.vue'
 
@@ -7,7 +7,8 @@ const tab = ref('register');
 
 const token = useRoute().query?.token || null
 // refs for registration
-const txtUsername = ref(null);
+const txtUsername = useTemplateRef("txtUsername");
+const btnSignUp = useTemplateRef("btnSignUp")
 const registerUsername = ref('');
 const registerEmail = ref('');
 const registerPassword = ref('');
@@ -34,7 +35,7 @@ async function handleLogin(e) {
 	const {data, error} = await authClient.signIn.email(
 		{ email: loginUser.value, password: loginPassword.value }, 
 		{ 
-			onSuccess: () => fuckies.value = "Password Reset, Don't loose it again, or do, i don't care, i mean I programmed this whole flow just in case you started showing signs of dementia, so I care a little bit I guess?",
+			onSuccess: () => navigateTo('/tracker'),
 			onError: (ctx) => fuckies.value = ctx.error.message
 		}
 	);
@@ -42,13 +43,18 @@ async function handleLogin(e) {
 async function passwordReset(e) {
 	e.preventDefault()
 	await authClient.resetPassword({newPassword: newPassword.value, token}, {
-		onSuccess: ctx => console.log("aaaa", ctx.data),
+		onSuccess: () => fuckies.value = "Password Reset, Don't loose it again, or do, i don't care, i mean I programmed this whole flow just in case you started showing signs of dementia, so I care a little bit I guess?",
 		onError: ctx => fuckies.value = ctx.error.message
 	})
 }
-onMounted(() => {
-	txtUsername.value.focus()
-	txtUsername.value.scrollIntoView({behavior: 'smooth'})
+onMounted(async () => {
+	// await nextTick();
+	setTimeout(() => {
+		if(txtUsername.value)
+			txtUsername.value.focus({preventScroll: true})
+
+		btnSignUp.value.scrollIntoView({behavior: 'smooth', block: 'nearest'})
+	}, 100)
 });
 </script>
 
@@ -68,7 +74,7 @@ onMounted(() => {
 			<input type="email" id="email" class="glassy" v-model="registerEmail" name="email" required />
 			<label for="password">Password:</label>
 			<input type="password" id="password" class="glassy" v-model="registerPassword" required />
-			<button class="glassy" @click="handleRegister">Letsa go</button>
+			<button class="glassy" @click="handleRegister" ref="btnSignUp">Letsa go</button>
 		</form>
 		<form v-else action="">
 			<label for="loginUser">Email/Username:</label>
@@ -172,6 +178,7 @@ onMounted(() => {
 		grid-column: 2;
 		justify-self: center;
 		width: 70%;
+		white-space: nowrap;
 	}
 	form a {
 		grid-column: span 2;
@@ -183,5 +190,25 @@ onMounted(() => {
 		background: red;
 		font-weight: bold;
 		color: white;
+	}
+	@media (max-width: 768px) {
+		#auth {
+			margin-top: 1em !important;
+			width: 80%;
+			font-size: 0.8rem;
+		}
+		form {
+			padding: 0.1em;
+			width: 100%;
+			min-width: 0;
+		}
+		h3 {
+			white-space: nowrap;
+		}
+		form input, form button {
+			padding: 0.25em 0.5em;
+			width: 100%;
+			box-sizing: border-box;
+		}
 	}
 </style>

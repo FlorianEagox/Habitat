@@ -34,4 +34,31 @@ definePageMeta({
 	#tracker {
 		flex: 1;
 	}
+	.action-button {
+		padding: 0.4em 1em;
+		border-radius: 8px;
+		font-weight: bold;
+		background: none;
+		border: 2px dashed hsla(var(--electro), 0.7);
+		color: hsl(var(--citrus));
+		cursor: pointer;
+		transition: background 0.2s, color 0.2s;
+	}
+	.danger {
+		border-color: hsl(var(--sanguine));
+		color: hsl(var(--sanguine));
+	}
+	.action-button:hover {
+		background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
+		color: hsl(var(--citrus));
+	}
+	@media (max-width: 768px) {
+		#dashboard {
+			display: block;
+			width: 100%;
+			padding: 0 0;
+			position: relative;
+			margin-top: 2em;
+		}
+	}
 </style>
