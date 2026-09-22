@@ -1,4 +1,5 @@
 import { db, toPublic } from '../db';
+import { getUser } from './users';
 import monk from 'monk';
 
 const habits = db.get('habits');
@@ -29,20 +30,25 @@ export async function addHabit(user, habit) {
 	}
 }
 
-export async function getHabits(user) {
+export async function getHabits(user, friendId) {
+	console.log({friendId, user}, await getUser(user))
 	if (!user)
 		throw new Error('Not authenticated');
 	try {
-		return toPublic(await habits.find({ owner: user.id })) || [];
+		if(!friendId)
+			return toPublic(await habits.find({ owner: user.id })) || [];
+		else if(user?.friends?.[friendId].status == "ACCEPTED")
+			return toPublic(await habits.find({ owner: friendId })) || [];
 	} catch (err) {
 		throw new Error('Error fetching habits');
 	}
 }
 
-export async function completeHabit(id, date, degreeOfCompletion) {  // fetch the existing habit
+export async function completeHabit(userId, id, date, degreeOfCompletion) {  // fetch the existing habit
   const habit = await habits.findOne({ _id: id });
   if (!habit) throw new Error('Habit not found');
 
+  if (habit.owner != userId) throw new Error("That's not your habit")
   // make sure datesCompleted exists
   const datesCompleted = habit.datesCompleted || {};
 

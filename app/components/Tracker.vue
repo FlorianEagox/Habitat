@@ -1,8 +1,10 @@
 <template>
 	<div id="tracker" class="raise">
-		<h2 class="metal raised">My Habits</h2>
+		<h2 class="metal raised">
+			<span v-text="friend?.username ? `${friend.username}'s` : 'My'"/> Habits
+		</h2>
 		<hr>
-		<div class="glowy-text" id="habbits-grid">
+		<div class="glowy-text" id="habits-grid">
 			<div id="headings">
 				<span>Habbit</span>
 				<span class="day-heading" v-for="date in listedDayHeadings" :key="date" v-text="date"></span>
@@ -12,7 +14,8 @@
 				<div v-for="date in listedDates" :key="date.getTime()" class="habit-day">
 					<input type="checkbox"
 					@change="completeHabbit($event, habit, date.getTime())"
-					:checked="habit.datesCompleted[date.getTime()]"/>
+					:checked="habit.datesCompleted[date.getTime()]"
+					:disabled="props.friendId"/>
 					<span class="optional-quantity" v-if="habit.datesCompleted[date.getTime()]">
 						<input type="text" 
 						:placeholder="habit.goal" class="glassy"
@@ -20,29 +23,32 @@
 						pattern="[0-9]{1,2}:[0-9]{2}"
 						v-if="habit.type === 'DURATION'"
 						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
+						:readonly="props.friendId"
 						/>
 						<input type="number" 
 						:placeholder="habit.goal" class="glassy"
 						v-model="habit.datesCompleted[date.getTime()]"
 						@change="completeHabbit($event, habit, date.getTime(), $event.target.value)"
 						v-else-if="habit.type === 'QUANTITY'"
-						/>
+						:readonly="props.friendId"
+						>
 					</span>
 				</div>
 			</div>
 			<h3 v-else="" id="no-habits" class="glowy-text">
-				No habbits to track, add one from the <nuxt-link to="/habits">Habits Panel</nuxt-link>
+				No habits to track, add one from the <nuxt-link to="/habits">Habits Panel</nuxt-link>
 			</h3>
 		</div>
 	</div>
 </template>
 
 <script setup>
-	import { ref, computed, onMounted } from 'vue'
-	import { useState } from '#app' // Nuxt composables
-// import { date } from 'better-auth'
+	import { ref, computed, onMounted, watch } from 'vue'
 
-	// --- Data / refs ---
+	const props = defineProps({
+		friendId: String
+	})
+	const friend = ref({})
 	const today = new Date()
 	const daysToShow = 7
 	const listedDates = Array.from({ length: daysToShow }, (_, i) =>  {
@@ -84,9 +90,22 @@
 		GqlCompleteHabit({habitId: habit.id, date: completionDate, degreeOfCompletion: val})
 	}
 
+	async function hydrateHabitData() {
+		const fetchedHabits = (await GqlHabits({owner: props?.friendId}))
+		habits.value = fetchedHabits.habits
+		if(props.friendId)
+			friend.value = habits.value[0].owner
+		else {
+			friend.value = {}
+		}
+	}
+
 	onMounted(async () => {
-		const fetchedHabits = (await GqlHabits()).habits
-		habits.value = fetchedHabits
+		hydrateHabitData();
+	})
+
+	watch(() => props.friendId, () => {
+		hydrateHabitData();
 	})
 </script>
 
@@ -99,7 +118,11 @@
 		border-radius: 25px;
 		overflow: visible; /* make sure content can overflow if needed */
 	}
-
+	#tracker h2 {
+		/* text-align: center; */
+		padding: 0.25em;
+		margin: 0.25em;
+	}
 	#tracker::before {
 		content: "";
 		position: absolute;
@@ -126,7 +149,7 @@
 		position: relative;
 		z-index: 1; /* ensure content sits above the background */
 	}
-	#habbits-grid {
+	#habits-grid {
 		display: grid;
 		grid-template-columns: 1.4fr repeat(7, 1fr);
 		grid-template-rows: auto;
@@ -167,6 +190,9 @@
 		margin: 0 auto;
 		padding: 30px;
 		cursor: pointer;
+	}
+	input[type="checkbox"].disabled {
+		pointer-events: none; /* Prevents mouse clicks entirely */
 	}
 	input[type="number"],
 	input[type="time"],

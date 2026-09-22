@@ -1,4 +1,5 @@
 <script setup>
+import { router } from 'better-auth/api';
 import { authClient } from '~/app.vue';
 const userId = (await authClient.useSession(useFetch)).data.value.user.id
 const userInfo = (await GqlUser({id: userId})).user
@@ -19,9 +20,10 @@ async function acceptFriendRequest(event, friendId) {
 </script>
 
 <template>
-    <div id="friends">
+    <div id="friends" class="glassy">
+        <h2 class="metal">Friends</h2>
         <div id="friend-search">
-            <h2>Find a Friend</h2>
+            <h3>Find a Friend</h3>
             <input type="text" id="txt-add-friend" class="glassy" v-model="queryName" @change="searchFriends">
             <ul id="found-friends">
                 <li v-for="friend in foundFriends" :key="friend.id">
@@ -36,18 +38,25 @@ async function acceptFriendRequest(event, friendId) {
             You haven't a friend in the world :-( \n Try adding tessa!
         </div>
         <ul id="friends-list" v-else>
-            <h2>Your Friends</h2>
+            <h3>Your Friends</h3>
             <li class="friend" v-for="friend in friends">
                <h3 v-text="friend.user.username"/>
-               <button id="accept-friend" v-if="friend.status == 'PENDING'" @click="acceptFriendRequest($event, friend.user.id)">Accept</button>
-               <button id="grapah" v-else-if="friend.status == 'ACCEPTED'">View Habits</button>
-               <p v-else>Awaiting Friend Request</p>
+               <button class="btn-accept-friend" v-if="friend.status == 'PENDING'" @click="acceptFriendRequest($event, friend.user.id)">Accept</button>
+               <button class="btn-view-graph" v-else-if="friend.status == 'ACCEPTED'" @click="navigateTo({path: '/tracker', query: {friend: friend.user.id}})">View Habits</button>
+               <p class="friend-pending" v-else>Awaiting Friend Request</p>
             </li>
         </ul>
         
     </div>
 </template>
 <style>
+    #friends {
+        margin: 2em auto;
+        padding: 1em;
+    }
+    #friend-search {
+        margin: 2em;
+    }
     #txt-add-friend {
         width: 100%;
     }

@@ -12,12 +12,12 @@ import { auth } from '../auth';
 const resolvers = {
 	Query: {
 		user: (_, {id}, context) => getUser(id || context.user.id),
-		habits: (_, __, context) => getHabits(context.user),
+		habits: (_, {owner}, context) => getHabits(context.user, owner),
 		searchUsers: (_, {part}, context) => searchUsers(part)
 	},
 	Mutation: {
 		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
-		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(habitId, date, degreeOfCompletion),
+		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(context.user.id, habitId, date, degreeOfCompletion),
 		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),
 		addFriend: (_, {friendId, status}, context) => addFriend(context.user.id, friendId, status)
 	},
@@ -26,7 +26,6 @@ const resolvers = {
   	},
 	User: {
 		friends: (parent) => {
-			console.log("a", parent.friends)
 			if(!parent.friends) return [];
 			return Object.entries(parent.friends).map(([id, status]) => ({
 				user: getUser(id),
