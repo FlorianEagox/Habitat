@@ -4,3 +4,6 @@
         <p>coming soon</p>
     </article>
 </template>
+
+<style>
+</style>

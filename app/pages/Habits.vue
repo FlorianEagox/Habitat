@@ -7,8 +7,24 @@
 				<span class="label-text">Habit Name</span>
 				<input v-model="form.name" class="glassy" placeholder="e.g. Take Walk" required />
 			</label>
+			<div id="suggest">
+				<input type="checkbox" id="btn-suggest" v-model="showSuggestions" />
+				<label for="btn-suggest">
+					<Icon name="material-symbols:dropdown-menu"/>
+					Show Suggestions
+				</label>
+				<select v-show="showSuggestions" v-model="selectedHabit" name="selected-habit" id="select-habit">
+					<option
+					v-for="habit in selectableHabits"
+					:key="habit.name"
+					:value="habit"
+					v-text="habit.name"
+					/>
+				</select>
+			</div>
 			<label>
 				<span class="label-text">Type</span>
+				<hr />
 				<select v-model="form.type" class="glassy">
 					<option value="DURATION">Duration/Time</option>
 					<option value="QUANTITY">Quantity</option>
@@ -36,7 +52,7 @@
 					<div class="habit-info">
 						<span class="habit-name">{{ habit.name }}</span>
 						<span class="habit-type">{{ habit.type }}</span>
-						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }}</span>
+						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }} {{ habit.unit }}</span>
 					</div>
 					<div class="habit-actions">
 						<button class="action-button glassy" @click="populateForm(habit)">
@@ -59,7 +75,8 @@
 import { reactive, ref, computed } from 'vue'
 import { useState } from '#app'
 import { HabitTypes } from '#gql/default'
-
+import globalHabits from '~/assets/selectableHabits'
+import { formatFloatToDuration } from '~/utils'
 
 const form = reactive({
 	_id: null,
@@ -67,8 +84,21 @@ const form = reactive({
 	type: 'BOOLEAN',
 	goal: null,
 	unit: null,
+	clonedFrom: null
 })
 const isEditing = ref(false)
+const showSuggestions = ref(false);
+const selectableHabits = useState('selectableHabits', () =>  [])// globalHabits)
+const selectedHabit = ref({})
+watchEffect(() => {
+	resetForm()
+	Object.assign(form, selectedHabit.value)
+	if(showSuggestions)
+		form.clonedFrom = selectedHabit.value.id
+	form.id = null
+	form.goal = formatFloatToDuration(selectedHabit.value?.goal)
+})
+
 
 function resetForm() {
 	form._id = null
@@ -79,6 +109,7 @@ function resetForm() {
 }
 
 async function addHabit() {
+	console.log({form})
 	if (!form.name.trim()) return
 	try {
 		let goal = form.goal
@@ -91,6 +122,7 @@ async function addHabit() {
 			type: HabitTypes[form.type.toUpperCase()],
 			goal,
 			unit: form.unit,
+			clonedFrom: form?.clonedFrom
 		})
 		console.log(status, data)
 		await refreshHabits();
@@ -113,11 +145,13 @@ const dummyHabits = [
 
 const habits = useState('habits', () => [])
 
+
 async function refreshHabits() {
 	habits.value = (await GqlHabits()).habits
+	selectableHabits.value = (await GqlSelectableHabits()).selectableHabits
 }
 
-onMounted(refreshHabits);
+onMounted(async () => await refreshHabits());
 
 function populateForm(h) {
 	Object.assign(form, h)
@@ -152,6 +186,13 @@ const displayHabits = computed(() =>
 	margin-bottom: 2em;
 	align-items: end;
 }
+#suggest input {
+	display: none;
+}
+#suggest label {
+	display: block;
+}
+
 .habit-form label {
 	display: flex;
 	flex-direction: column;

@@ -32,13 +32,16 @@ enum HabitTypes {
 
 type Habit {
 	id: ID!
-	owner: User!
+	private: Boolean
+	owner: User
 	name: String!
 	type: HabitTypes!
 	goal: Float
 	unit: String
 	createdAt: String
 	datesCompleted: JSON
+	clonedFrom: Habit
+	timeScaler: Float
 }
 
 
@@ -48,13 +51,14 @@ type Query {
 	users(part: String): [User!]!
 	habit(id: ID!): Habit
 	habits(owner: ID): [Habit]
+	selectableHabits: [Habit]
 	searchUsers(part: String): [User]
 }
 
 type Mutation {
 	register(username: String!, email: String!, password: String!): User
 	login(email: String!, password: String!): String
-	addHabit(id: ID, name: String!, type: HabitTypes!, goal: Float, unit: String, datesCompleted: JSON): Habit
+	addHabit(id: ID, name: String!, type: HabitTypes!, goal: Float, unit: String, datesCompleted: JSON, clonedFrom: ID): Habit
 	deleteHabit(id: ID): Habit
 	completeHabit(habitId: ID!, date: BigInt!, degreeOfCompletion: BoolOrFloat): Habit
 	addFriend(friendId: ID!, status: FriendRequestStatus!): User

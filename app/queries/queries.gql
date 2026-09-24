@@ -2,8 +2,8 @@ scalar JSON
 scalar BigInt
 scalar BoolOrFloat
 
-mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Float, $unit: String, $datesCompleted: JSON) {
-  addHabit(id: $id, name: $name, type: $type, goal: $goal, unit: $unit, datesCompleted: $datesCompleted) {
+mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Float, $unit: String, $datesCompleted: JSON, $clonedFrom: ID) {
+  addHabit(id: $id, name: $name, type: $type, goal: $goal, unit: $unit, datesCompleted: $datesCompleted, clonedFrom: $clonedFrom) {
     id
     name
     type
@@ -14,6 +14,16 @@ mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Float, $un
     owner {
       id
       username
+    }
+    clonedFrom {
+      id
+      name
+      type
+      datesCompleted
+      owner {
+        id
+        username
+      }
     }
   }
 }
@@ -113,9 +123,20 @@ query habit($id: ID!) {
     unit
     createdAt
     datesCompleted
+    private
     owner {
       id
       username
+    }
+    clonedFrom {
+      id
+      name
+      type
+      datesCompleted
+      owner {
+        id
+        username
+      }
     }
   }
 }
@@ -142,5 +163,25 @@ query habits($owner: ID) {
       id
       username
     }
+    clonedFrom {
+      id
+      name
+      type
+      datesCompleted
+      owner {
+        id
+        username
+      }
+    }
+  }
+}
+
+query selectableHabits {
+  selectableHabits {
+    id
+    name
+    type
+    goal
+    unit
   }
 }

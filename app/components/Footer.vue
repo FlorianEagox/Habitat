@@ -15,6 +15,7 @@ export default {
 <style scoped>
 	footer {
 		margin-top: auto;
+		margin-bottom: 0.5em;
 	}
 	a {
 		color: hsl(var(--citrus));
