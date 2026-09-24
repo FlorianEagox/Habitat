@@ -6,6 +6,28 @@ import { parseDurationToFloat, formatFloatToDuration } from '@/utils.js'
 
 const habits = db.get('habits');
 
+export const resolvers = {
+	Query: {
+		habits: (_, {owner}, context) => getHabits(context.user, owner),
+		selectableHabits: () => getSelectableHabits()
+	},
+	Mutation: {
+		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
+		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(context.user.id, habitId, date, degreeOfCompletion),
+		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),				
+	},
+	Habit: {
+    	owner: (habit) => {
+			if(!habit.owner) return null
+			return getUser(habit.owner) // <-- hydrate it here
+		},
+		clonedFrom: (habit, {habitId, friendId}, context) => {
+			if(!habit.clonedFrom) return null;
+			return getHabit(habit.clonedFrom, context.user, habit?.owner)
+		} 
+  	},
+}
+
 export async function addHabit(user, habit) {
 	console.log("Adding", {habit})
 	if (!user) throw new Error('Not authenticated');
@@ -87,7 +109,7 @@ export async function updateSelectableHabits() {
 			update: {
 				$set: {
 					...habit,
-					goal: parseDurationToFloat(habit?.goal),
+					goal: habit.type == "DURATION" ? parseDurationToFloat(habit?.goal) : parseFloat(habit?.goal)  || 0,
 					// timeScaler: parseDurationToFloat(habit?.timeScaler),
 				},
 				$setOnInsert: {

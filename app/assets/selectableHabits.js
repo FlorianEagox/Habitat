@@ -15,13 +15,22 @@ export default [
 {
 	name: "Read a Book",
 	type: "QUANTITY",
-	goal: "20",
+	goal: 20,
 	unit: "Pages",
 	"timeScaler": 0.58
 },
 {
 	name: "Play an Instrument",
 	type: "DURATION",
-	goal: "30",
-}
+	goal: "00:30",
+},
+{
+	name: "Journal",
+	type: "BOOLEAN"
+},
+{
+	name: "Meditate",
+	type: "DURATION",
+	goal: "00:10"
+},
 ]

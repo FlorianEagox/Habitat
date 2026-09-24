@@ -34,6 +34,11 @@ definePageMeta({
 	#tracker {
 		flex: 1;
 	}
+	button {
+		display: flex;
+		align-items: center;
+		text-align: center;
+	}
 	.action-button {
 		padding: 0.4em 1em;
 		border-radius: 8px;
@@ -48,10 +53,14 @@ definePageMeta({
 		border-color: hsl(var(--sanguine));
 		color: hsl(var(--sanguine));
 	}
+	.danger:hover {
+		background: linear-gradient(-180deg, red, hsl(var(--purple))) !important;
+	}
 	.action-button:hover {
 		background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
 		color: hsl(var(--citrus));
 	}
+	
 	@media (max-width: 768px) {
 		#dashboard {
 			display: block;

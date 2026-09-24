@@ -58,7 +58,7 @@ type Query {
 type Mutation {
 	register(username: String!, email: String!, password: String!): User
 	login(email: String!, password: String!): String
-	addHabit(id: ID, name: String!, type: HabitTypes!, goal: Float, unit: String, datesCompleted: JSON, clonedFrom: ID): Habit
+	addHabit(id: ID, name: String!, type: HabitTypes!, goal: Float, unit: String, datesCompleted: JSON, clonedFrom: ID, private: Boolean): Habit
 	deleteHabit(id: ID): Habit
 	completeHabit(habitId: ID!, date: BigInt!, degreeOfCompletion: BoolOrFloat): Habit
 	addFriend(friendId: ID!, status: FriendRequestStatus!): User

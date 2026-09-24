@@ -9,7 +9,7 @@
 				<span>Habbit</span>
 				<span class="day-heading" v-for="date in listedDayHeadings" :key="date" v-text="date"></span>
 			</div>
-			<div v-for="habit in habits" :key="habit.name" class="habit" v-if="habits.length > 0">
+			<div v-for="habit in habits" :key="habit.name" class="habit" v-if="habits.length > 0" draggable="true">
 				<h3 class="glowy-text">{{ habit.name }}</h3>
 				<div v-for="date in listedDates" :key="date.getTime()" class="habit-day">
 					<input type="checkbox"

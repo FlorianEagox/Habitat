@@ -1,6 +1,6 @@
 <template>
 	<div class="habits-page glassy glowy-text">
-		<h2 class="metal raised">Manage Your Habits</h2>
+		<h2 class="metal">Manage Your Habits</h2>
 		<hr>
 		<form class="habit-form" @submit.prevent="addHabit" novalidate>
 			<label>
@@ -40,6 +40,13 @@
 				<span class="label-text">Unit</span>
 				<input placeholder="pages, laps" v-model="form.unit" min="1" class="glassy" />
 			</label>
+			<label id="private" for="chk-private">
+				<input type="checkbox" name="chk-private" id="chk-private" v-model="form['private']">
+				<span>
+					<Icon :name="privacyStatus(form['private'])" />
+					Make Private
+				</span>
+			</label>
 			<div class="actions">
 				<button class="glassy" type="submit">{{ isEditing ? 'Save' : 'Add Habit' }}</button>
 				<button class="glassy" type="button" @click="resetForm" v-if="isEditing">Cancel</button>
@@ -50,6 +57,7 @@
 			<ul>
 				<li v-for="habit in displayHabits" :key="habit.id" class="habit-item glassy">
 					<div class="habit-info">
+						<Icon :name="privacyStatus(habit?.private)" class="habit-privacy"/>
 						<span class="habit-name">{{ habit.name }}</span>
 						<span class="habit-type">{{ habit.type }}</span>
 						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }} {{ habit.unit }}</span>
@@ -76,7 +84,7 @@ import { reactive, ref, computed } from 'vue'
 import { useState } from '#app'
 import { HabitTypes } from '#gql/default'
 import globalHabits from '~/assets/selectableHabits'
-import { formatFloatToDuration } from '~/utils'
+import { formatFloatToDuration, parseDurationToFloat } from '~/utils'
 
 const form = reactive({
 	_id: null,
@@ -84,19 +92,22 @@ const form = reactive({
 	type: 'BOOLEAN',
 	goal: null,
 	unit: null,
-	clonedFrom: null
+	clonedFrom: null,
+	'private': false
 })
 const isEditing = ref(false)
 const showSuggestions = ref(false);
 const selectableHabits = useState('selectableHabits', () =>  [])// globalHabits)
 const selectedHabit = ref({})
-watchEffect(() => {
+
+watch(selectedHabit, (newHabit) => {
 	resetForm()
 	Object.assign(form, selectedHabit.value)
 	if(showSuggestions)
 		form.clonedFrom = selectedHabit.value.id
 	form.id = null
-	form.goal = formatFloatToDuration(selectedHabit.value?.goal)
+	if(selectedHabit.value.type == "DURATION")
+		form.goal = formatFloatToDuration(selectedHabit.value?.goal)
 })
 
 
@@ -104,7 +115,8 @@ function resetForm() {
 	form._id = null
 	form.name = ''
 	form.type = 'BOOLEAN'
-	form.goal = null
+	form.goal = null,
+	form['private'] = false,
 	isEditing.value = false
 }
 
@@ -122,7 +134,8 @@ async function addHabit() {
 			type: HabitTypes[form.type.toUpperCase()],
 			goal,
 			unit: form.unit,
-			clonedFrom: form?.clonedFrom
+			clonedFrom: form?.clonedFrom?.id || form?.clonedFrom,
+			'private': form?.['private']
 		})
 		console.log(status, data)
 		await refreshHabits();
@@ -132,16 +145,6 @@ async function addHabit() {
 		return
 	}
 }
-
-const dummyHabits = [
-{ _id: 1, name: 'Wake up time', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
-{ _id: 2, name: 'Play Piano', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
-{ _id: 3, name: 'Read Book', type: 'quantity', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
-{ _id: 4, name: 'Exercise', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
-{ _id: 5, name: 'Meditate', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
-{ _id: 6, name: 'Take Medication', type: 'boolean', datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
-{ _id: 7, name: 'Journal', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
-]
 
 const habits = useState('habits', () => [])
 
@@ -154,6 +157,7 @@ async function refreshHabits() {
 onMounted(async () => await refreshHabits());
 
 function populateForm(h) {
+	h.goal = formatFloatToDuration(h.goal)
 	Object.assign(form, h)
 	isEditing.value = true
 }
@@ -171,6 +175,20 @@ const displayHabits = computed(() =>
 			: habit.goal
 	}))
 )
+const privacyStatus = computed(() => {
+	return (isPrivate) => !isPrivate ? 'material-symbols:undereye-rounded' : 'streamline:invisible-1-solid'
+})
+
+const dummyHabits = [
+{ _id: 1, name: 'Wake up time', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
+{ _id: 2, name: 'Play Piano', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
+{ _id: 3, name: 'Read Book', type: 'quantity', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
+{ _id: 4, name: 'Exercise', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
+{ _id: 5, name: 'Meditate', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
+{ _id: 6, name: 'Take Medication', type: 'boolean', datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
+{ _id: 7, name: 'Journal', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
+]
+
 </script>
 
 <style>
@@ -215,6 +233,15 @@ const displayHabits = computed(() =>
 	text-shadow: inherit;
 	padding: 0.5em 1em;
 	font-size: 1.1em;
+	margin: auto;
+}
+.habit-form #private {
+	display: inline-block;
+	/* justify-items: flex-start; */
+}
+#private > * {
+	/* display: inline; */
+	
 }
 .actions {
 	grid-column: span 2;
@@ -260,6 +287,11 @@ const displayHabits = computed(() =>
 	font-size: 1.2em;
 	text-shadow: 0 0 5px hsla(var(--purple), 1);
 }
+.habit-privacy {
+	display: inline-block;
+	/* height: 100%; */
+
+}
 .habit-type, .habit-goal, .habit-progress {
 	font-size: 0.95em;
 	color: hsl(var(--electro));
@@ -280,6 +312,7 @@ input[type=time]::-webkit-datetime-edit-ampm-field {
 	display: none;
 
 }
+
 
 @media (max-width: 768px) {
 	.habits-page {

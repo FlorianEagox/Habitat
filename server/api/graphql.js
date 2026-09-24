@@ -5,33 +5,20 @@ import { startServerAndCreateH3Handler } from '@as-integrations/h3';
 import { getHeaders } from 'h3';
 
 import { addFriend, getUser, searchUsers } from '../resolvers/users';
-import { addHabit, getHabits, getHabit, completeHabit, deleteHabit, getSelectableHabits, updateSelectableHabits } from '../resolvers/habits';
+import { resolvers as habitResolvers, updateSelectableHabits } from '../resolvers/habits';
 
 import { auth } from '../auth';
+import { resolveObjMapThunk } from 'graphql';
 
 const resolvers = {
 	Query: {
 		user: (_, {id}, context) => getUser(id || context.user.id),
-		habits: (_, {owner}, context) => getHabits(context.user, owner),
 		searchUsers: (_, {part}, context) => searchUsers(part),
-		selectableHabits: () => getSelectableHabits()
 	},
 	Mutation: {
-		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
-		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(context.user.id, habitId, date, degreeOfCompletion),
-		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),
 		addFriend: (_, {friendId, status}, context) => addFriend(context.user.id, friendId, status)
 	},
-	Habit: {
-    	owner: (habit) => {
-			if(!habit.owner) return null
-			return getUser(habit.owner) // <-- hydrate it here
-		},
-		clonedFrom: (habit, {habitId, friendId}, context) => {
-			if(!habit.clonedFrom) return null;
-			return getHabit(habit.clonedFrom, context.user, habit?.owner)
-		} 
-  	},
+	
 	User: {
 		friends: (parent) => {
 			if(!parent.friends) return [];
@@ -42,8 +29,9 @@ const resolvers = {
 		}
 	}
 };
+console.log({resolvers})
 
-const apollo = new ApolloServer({typeDefs, resolvers});
+const apollo = new ApolloServer({typeDefs, resolvers: [resolvers, habitResolvers]});
 // const app = express();
 // app.use(morgan())
 export default startServerAndCreateH3Handler(apollo, {

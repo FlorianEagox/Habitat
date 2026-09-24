@@ -15,7 +15,7 @@
 		</nav> -->
 		<div v-if="session.data" id="user" class="glassy">
 			<span>{{ session.data.user.name }}</span>
-			<button id="logout" @click="triggerLogout">
+			<button id="logout" class="danger" @click="triggerLogout">
 				<Icon name="material-symbols:power-settings-circle-rounded" />
 				Log Out
 			</button>
@@ -173,12 +173,10 @@ const session = authClient.useSession();
 		border-radius: 15px;
 		padding: 0.5em;
 		border: none;
-		border: 2px dashed maroon;
-		background: #ffffffaa
+		background: #ffffffaa;
+		display: flex;
 	}
-	#logout:hover {
-		background: linear-gradient(-180deg, red, hsl(var(--purple)));
-	}
+
 	@media (max-width: 768px) {
 		#splash-text {
 			top: 10px;
@@ -226,9 +224,6 @@ const session = authClient.useSession();
 			color: hsl(var(--electro));
 			font-size: 0.6rem;
 			white-space: nowrap;
-		}
-		#logout:hover {
-			background-color: hsla(var(--electro), 0.1);
 		}
 	}
 </style>
