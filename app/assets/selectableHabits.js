@@ -6,11 +6,13 @@ export default [
 {
 	name: "Exercise",
 	type: "DURATION",
-	goal: "00:45"
+	goal: "00:46",
+	completeSfx: "nice-ass-amigo.mp3"
 },
 {
 	name: "Tidy Up",
 	type: "BOOLEAN",
+	completeSfx: "esta-bonito.mp3"
 },
 {
 	name: "Read a Book",
@@ -33,4 +35,11 @@ export default [
 	type: "DURATION",
 	goal: "00:10"
 },
+{
+	name: "Prepare Meals",
+	type: "QUANTITY",
+	goal: 5,
+	unit: "Meals",
+	completeSfx: "zelda-cooking-normal.mp3"
+}
 ]

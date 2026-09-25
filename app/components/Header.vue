@@ -71,7 +71,9 @@ const splashTexts = [
 	"It's dangerous to go alone, take this!",
 	"Marco? Polo!",
 	"#VapeNation",
-	"Go Piss, Girl!"
+	"Go Piss, Girl!",
+	"Don't Murder Today",
+	"Zuko, you must look within yourself to save yourself from your other self. Only then will your true self reveal itself"
 ];
 const splashText = computed(() => {
 	return splashTexts[Math.floor(Math.random() * splashTexts.length)];

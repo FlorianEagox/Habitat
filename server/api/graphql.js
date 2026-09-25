@@ -29,7 +29,6 @@ const resolvers = {
 		}
 	}
 };
-console.log({resolvers})
 
 const apollo = new ApolloServer({typeDefs, resolvers: [resolvers, habitResolvers]});
 // const app = express();

@@ -5,7 +5,7 @@
 				<li><nuxt-link to="/" class="glowy-text" active-class="selected"><Icon name="hugeicons:notebook-02"/> Tracker</nuxt-link></li>
 				<li><nuxt-link to="/habits" class="glowy-text" active-class="selected"><Icon name="material-symbols:list-alt-check-outline-sharp"/> My Habits</nuxt-link></li>
 				<li><nuxt-link to="/friends" class="glowy-text" active-class="selected"><Icon name="game-icons:three-friends"/> Friends</nuxt-link></li>
-				<li><nuxt-link to="/insights" class="glowy-text"><Icon name="material-symbols:insights"/> Insights</nuxt-link></li>
+				<li><nuxt-link to="/insights" class="glowy-text"  active-class="selected"><Icon name="material-symbols:insights"/> Insights</nuxt-link></li>
 			</ul>
 		</nav>
 	</aside>

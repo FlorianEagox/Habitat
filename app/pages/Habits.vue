@@ -1,8 +1,8 @@
 <template>
-	<div class="habits-page glassy glowy-text">
+	<div class="habits-page glassy">
 		<h2 class="metal">Manage Your Habits</h2>
 		<hr>
-		<form class="habit-form" @submit.prevent="addHabit" novalidate>
+		<form class="habit-form glowy-text" @submit.prevent="addHabit" novalidate>
 			<label>
 				<span class="label-text">Habit Name</span>
 				<input v-model="form.name" class="glassy" placeholder="e.g. Take Walk" required />
@@ -56,8 +56,8 @@
 			<h3 class="metal">Current Habits</h3>
 			<ul>
 				<li v-for="habit in displayHabits" :key="habit.id" class="habit-item glassy">
+					<Icon :name="privacyStatus(habit?.private)" class="habit-privacy"/>
 					<div class="habit-info">
-						<Icon :name="privacyStatus(habit?.private)" class="habit-privacy"/>
 						<span class="habit-name">{{ habit.name }}</span>
 						<span class="habit-type">{{ habit.type }}</span>
 						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }} {{ habit.unit }}</span>
@@ -84,7 +84,7 @@ import { reactive, ref, computed } from 'vue'
 import { useState } from '#app'
 import { HabitTypes } from '#gql/default'
 import globalHabits from '~/assets/selectableHabits'
-import { formatFloatToDuration, parseDurationToFloat } from '~/utils'
+import { formatFloatToDuration, parseDurationToFloat } from '~/utils/textRendering'
 
 const form = reactive({
 	_id: null,
@@ -140,6 +140,7 @@ async function addHabit() {
 		console.log(status, data)
 		await refreshHabits();
 		resetForm()
+		sfxStore().randomSfxFromCategory('addHabit')
 	} catch (error) {
 		console.error('Error adding/editing habit:', error)
 		return
@@ -288,9 +289,7 @@ const dummyHabits = [
 	text-shadow: 0 0 5px hsla(var(--purple), 1);
 }
 .habit-privacy {
-	display: inline-block;
-	/* height: 100%; */
-
+	flex: 0 0 10%;
 }
 .habit-type, .habit-goal, .habit-progress {
 	font-size: 0.95em;

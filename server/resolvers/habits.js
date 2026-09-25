@@ -2,7 +2,7 @@ import { db, toPublic } from '../db';
 import { getUser } from './users';
 import monk from 'monk';
 import selectableHabits from '@/assets/selectableHabits.js'
-import { parseDurationToFloat, formatFloatToDuration } from '@/utils.js'
+import { parseDurationToFloat, formatFloatToDuration } from '@/utils/textRendering'
 
 const habits = db.get('habits');
 
@@ -120,7 +120,7 @@ export async function updateSelectableHabits() {
 			upsert: true
 		}
 	})))
-	console.log({updatedHabits}. updatedHabits.upserted)
+	console.log({updatedHabits}, updatedHabits.upserted)
 	} catch(e) {console.log(e)}
 }
 export async function getSelectableHabits() {

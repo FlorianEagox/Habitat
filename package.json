@@ -16,6 +16,7 @@
     "@nuxt/eslint": "1.9.0",
     "@nuxt/fonts": "0.11.4",
     "@nuxt/icon": "2.0.0",
+    "@pinia/nuxt": "^1.0.2",
     "@vite-pwa/nuxt": "^1.1.1",
     "apollo": "^2.34.0",
     "apollo-server-express": "^3.13.0",
@@ -25,6 +26,7 @@
     "graphql": "^16.14.2",
     "graphql-subscriptions": "^3.0.0",
     "graphql-ws": "^6.2.2",
+    "howler": "^2.2.4",
     "mongodb": "^6.21.0",
     "monk": "^7.3.4",
     "morgan": "^1.12.1",
@@ -32,6 +34,7 @@
     "nuxt-auth-utils": "0.5.23",
     "nuxt-graphql-client": "0.2.46",
     "nuxt-graphql-server": "^3.1.6",
+    "pinia": "^4.0.3",
     "resend": "^6.28.1",
     "vue": "^3.5.43",
     "vue-router": "^4.6.4"

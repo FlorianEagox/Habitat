@@ -46,7 +46,8 @@
 
 <script setup>
 	import { ref, computed, onMounted, watch } from 'vue'
-	import { parseDurationToFloat, formatFloatToDuration } from '~/utils'
+	import { sfxStore } from '~/stores/SoundManager'
+	import { parseDurationToFloat, formatFloatToDuration } from '~/utils/textRendering'
 
 	const props = defineProps({
 		friendId: String
@@ -58,24 +59,13 @@
 		const d = new Date(new Date().setDate(today.getDate() - i))
 		d.setUTCHours(0,0,0,0)
 		return d
-	}
-	)
-
-	const dummyHabits = [
-	{ name: "Wake up time", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
-	{ name: "Play Piano", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
-	{ name: "Read Book", type: "quantity", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
-	{ name: "Exercise", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
-	{ name: "Meditate", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
-	{ name: "Take Medication", type: "boolean", datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
-	{ name: "Journal", type: "duration", datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
-	]
+	})
 
 	const habits = ref([])
 
 	const listedDayHeadings = computed(() => 
 		listedDates.map(date =>
-			date.toLocaleDateString('en-US', { weekday: 'short' })
+			date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC'})
 		)
 	)
 
@@ -97,9 +87,10 @@
 			delete habit.datesCompleted[completionDate]
 			val = null
 		}
- 
+		
 		try {
 			await GqlCompleteHabit({ habitId: habit.id, date: completionDate, degreeOfCompletion: val })
+			sfxStore().chooseHabitSfx(habit, checked, parseDurationToFloat(degreeOfCompletion))
 		} catch (err) {
 			console.error('Failed to save habit completion', err)
 			// roll back the optimistic update so the UI matches what's actually saved
@@ -122,6 +113,7 @@
 
 	onMounted(async () => {
 		hydrateHabitData();
+		
 	})
 
 	watch(() => props.friendId, () => {

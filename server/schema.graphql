@@ -42,8 +42,8 @@ type Habit {
 	datesCompleted: JSON
 	clonedFrom: Habit
 	timeScaler: Float
+	completeSfx: String
 }
-
 
 type Query {
 	me: User

@@ -1,33 +1,69 @@
-scalar JSON
-scalar BigInt
-scalar BoolOrFloat
+fragment UserCore on User {
+  id
+  username
+}
 
-mutation addHabit($id: ID, $name: String!, $type: HabitTypes!, $goal: Float, $unit: String, $datesCompleted: JSON, $clonedFrom: ID, $private: Boolean) {
-  addHabit(id: $id, name: $name, type: $type, goal: $goal, unit: $unit, datesCompleted: $datesCompleted, clonedFrom: $clonedFrom, private: $private) {
+fragment HabitBase on Habit {
+  id
+  name
+  type
+  goal
+  unit
+  createdAt
+  datesCompleted
+  private
+  owner {
     id
-    name
-    type
-    goal
-    unit
-    createdAt
-    datesCompleted
-    private
-    owner {
-      id
-      username
-    }
-    clonedFrom {
-      id
-      name
-      type
-      datesCompleted
-      owner {
-        id
-        username
-      }
-    }
+    username
   }
 }
+
+fragment UserProfile on User {
+  ...UserCore
+  email
+  friends {
+    user {
+      ...UserCore
+    }
+    status
+  }
+  habits {
+    id
+    name
+    datesCompleted
+  }
+}
+
+# --- 2. Mutations ---
+
+mutation addHabit(
+  $id: ID
+  $name: String!
+  $type: HabitTypes!
+  $goal: Float
+  $unit: String
+  $datesCompleted: JSON
+  $clonedFrom: ID
+  $private: Boolean
+) {
+  addHabit(
+    id: $id
+    name: $name
+    type: $type
+    goal: $goal
+    unit: $unit
+    datesCompleted: $datesCompleted
+    clonedFrom: $clonedFrom
+    private: $private
+  ) {
+    ...HabitBase
+    clonedFrom {
+      ...HabitBase
+      completeSfx
+    } # 👈 Extends the base fragment with the SFX!
+  }
+}
+
 mutation deleteHabit($id: ID) {
   deleteHabit(id: $id) {
     id
@@ -39,17 +75,22 @@ mutation deleteHabit($id: ID) {
   }
 }
 
-# Complete a habit for a specific date
-mutation completeHabit($habitId: ID!, $date: BigInt!, $degreeOfCompletion: BoolOrFloat) {
-  completeHabit(habitId: $habitId, date: $date, degreeOfCompletion: $degreeOfCompletion) {
+mutation completeHabit(
+  $habitId: ID!
+  $date: BigInt!
+  $degreeOfCompletion: BoolOrFloat
+) {
+  completeHabit(
+    habitId: $habitId
+    date: $date
+    degreeOfCompletion: $degreeOfCompletion
+  ) {
     id
     name
     datesCompleted
   }
 }
 
-
-# Add a friend by ID
 mutation addFriend($friendId: ID!, $status: FriendRequestStatus!) {
   addFriend(friendId: $friendId, status: $status) {
     id
@@ -63,49 +104,18 @@ mutation addFriend($friendId: ID!, $status: FriendRequestStatus!) {
   }
 }
 
-# Get the current user
+# --- 3. Queries ---
+
 query me {
   me {
-    id
-    username
-    email
-    friends {
-      user {
-        id
-        username
-      }
-      status
-    }
-    habits {
-      id
-      name
-      datesCompleted
-    }
+    ...UserProfile
   }
 }
-
-# Get a user by ID
 query user($id: ID!) {
   user(id: $id) {
-    id
-    username
-    email
-    friends {
-      user {
-        id
-        username
-      }
-      status
-    }
-    habits {
-      id
-      name
-      datesCompleted
-    }
+    ...UserProfile
   }
 }
-
-# Get all users
 query users {
   users {
     id
@@ -113,71 +123,13 @@ query users {
     email
   }
 }
-
-# Get a habit by ID
-query habit($id: ID!) {
-  habit(id: $id) {
-    id
-    name
-    type
-    goal
-    unit
-    createdAt
-    datesCompleted
-    private
-    owner {
-      id
-      username
-    }
-    clonedFrom {
-      id
-      name
-      type
-      datesCompleted
-      owner {
-        id
-        username
-      }
-    }
-  }
-}
-
 query searchUsers($part: String) {
   searchUsers(part: $part) {
-    id,
-    username,
+    id
+    username
     avatar
   }
 }
-
-# Get all habits
-query habits($owner: ID) {
-  habits(owner: $owner) {
-    id
-    name
-    type
-    goal
-    unit
-    createdAt
-    datesCompleted
-    private
-    owner {
-      id
-      username
-    }
-    clonedFrom {
-      id
-      name
-      type
-      datesCompleted
-      owner {
-        id
-        username
-      }
-    }
-  }
-}
-
 query selectableHabits {
   selectableHabits {
     id
@@ -185,5 +137,25 @@ query selectableHabits {
     type
     goal
     unit
+  }
+}
+
+query habit($id: ID!) {
+  habit(id: $id) {
+    ...HabitBase
+    clonedFrom {
+      ...HabitBase
+      completeSfx
+    } # 👈 Extends the base fragment with the SFX!
+  }
+}
+
+query habits($owner: ID) {
+  habits(owner: $owner) {
+    ...HabitBase
+    clonedFrom {
+      ...HabitBase
+      completeSfx
+    }
   }
 }

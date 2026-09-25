@@ -34,11 +34,11 @@ definePageMeta({
 	#tracker {
 		flex: 1;
 	}
-	button {
+	/* button {
 		display: flex;
 		align-items: center;
 		text-align: center;
-	}
+	} */
 	.action-button {
 		padding: 0.4em 1em;
 		border-radius: 8px;
