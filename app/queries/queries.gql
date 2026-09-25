@@ -12,6 +12,7 @@ fragment HabitBase on Habit {
   createdAt
   datesCompleted
   private
+  negative
   owner {
     id
     username
@@ -45,6 +46,7 @@ mutation addHabit(
   $datesCompleted: JSON
   $clonedFrom: ID
   $private: Boolean
+  $negative: Boolean
 ) {
   addHabit(
     id: $id
@@ -55,6 +57,7 @@ mutation addHabit(
     datesCompleted: $datesCompleted
     clonedFrom: $clonedFrom
     private: $private
+    negative: $negative
   ) {
     ...HabitBase
     clonedFrom {

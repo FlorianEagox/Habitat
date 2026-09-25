@@ -41,5 +41,10 @@ export default [
 	goal: 5,
 	unit: "Meals",
 	completeSfx: "zelda-cooking-normal.mp3"
+},
+{
+	name: "Kapalbhati",
+	type: "DURATION",
+	goal: "00:05"
 }
 ]

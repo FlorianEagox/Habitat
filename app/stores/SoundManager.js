@@ -36,17 +36,22 @@ export const sfxStore = defineStore('sfx', {
             this.playSound(category, options[(Math.random() * options.length) | 0])
         },
         chooseHabitSfx(habit, checked, degreeOfCompletion = 0) {
-            console.log("AAA")
+            console.log(console.log(checked, habit, degreeOfCompletion))
             if(checked) {
                 if(habit.completeSfx)
                     this.playSound('CustomHabitSfx', habit.completeSfx)
                 else if(habit.clonedFrom?.completeSfx)
                     this.playSound('CustomHabitSfx', habit.clonedFrom.completeSfx)
                 else
-                    sfxStore().randomSfxFromCategory('completeHabitPositive')
+                    if(!habit.negative)
+                        sfxStore().randomSfxFromCategory('completeHabitPositive')
+                    else
+                        sfxStore().randomSfxFromCategory('completeHabitNegative')
             }
-            if(degreeOfCompletion >= habit.goal)
+            if(!habit.negative && degreeOfCompletion && degreeOfCompletion >= habit.goal)
                     sfxStore().randomSfxFromCategory('hitGoal')
+                else if(habit.negative && (degreeOfCompletion && degreeOfCompletion <= habit.goal))
+                    sfxStore().randomSfxFromCategory('hitGoal')   
         }
     }
 

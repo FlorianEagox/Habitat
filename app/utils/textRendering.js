@@ -12,7 +12,7 @@ export function formatFloatToDuration(value) {
 // Converts a user UI string like "1:30" into a database float 1.5
 export function parseDurationToFloat(stringValue) {
     if (typeof stringValue == 'number') return stringValue
-    if (!stringValue || !stringValue.includes(':')) return 0;
+    if (!stringValue || !stringValue.includes(':')) return parseFloat(stringValue);
     
     const [hoursStr, minutesStr] = stringValue.split(':');
     const hours = parseInt(hoursStr, 10) || 0;

@@ -90,6 +90,7 @@
 		
 		try {
 			await GqlCompleteHabit({ habitId: habit.id, date: completionDate, degreeOfCompletion: val })
+			console.log({degreeOfCompletion})
 			sfxStore().chooseHabitSfx(habit, checked, parseDurationToFloat(degreeOfCompletion))
 		} catch (err) {
 			console.error('Failed to save habit completion', err)

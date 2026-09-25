@@ -32,7 +32,7 @@
 				</select>
 			</label>
 			<label v-if="form.type !== 'BOOLEAN'">
-				<span class="label-text">Goal</span>
+				<span class="label-text" v-text:text="negativityStatus(form.negative)[0]" />
 				<input v-if="form.type == 'QUANTITY'" type='number' v-model="form.goal" min="1" class="glassy" />
 				<input v-else type="text"  v-model="form.goal" step="300" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="HH:MM" class="glassy"/>
 			</label>
@@ -40,11 +40,18 @@
 				<span class="label-text">Unit</span>
 				<input placeholder="pages, laps" v-model="form.unit" min="1" class="glassy" />
 			</label>
-			<label id="private" for="chk-private">
+			<label id="private" class="form-bool" for="chk-private">
 				<input type="checkbox" name="chk-private" id="chk-private" v-model="form['private']">
 				<span>
 					<Icon :name="privacyStatus(form['private'])" />
 					Make Private
+				</span>
+			</label>
+			<label id="negative" class="form-bool" for="chk-negative">
+				<input type="checkbox" name="chk-negative" id="chk-negative" v-model="form['negative']">
+				<span>
+					<Icon :name="negativityStatus(form['negative'])[1]" />
+					Negative Habit
 				</span>
 			</label>
 			<div class="actions">
@@ -55,12 +62,12 @@
 		<div class="habits-list">
 			<h3 class="metal">Current Habits</h3>
 			<ul>
-				<li v-for="habit in displayHabits" :key="habit.id" class="habit-item glassy">
+				<li v-for="habit in displayHabits" :key="habit.id" class="habit-item glassy" v-bind:class="{'danger': habit.negative}">
 					<Icon :name="privacyStatus(habit?.private)" class="habit-privacy"/>
 					<div class="habit-info">
 						<span class="habit-name">{{ habit.name }}</span>
 						<span class="habit-type">{{ habit.type }}</span>
-						<span v-if="habit.goal" class="habit-goal">Goal: {{ habit.displayGoal }} {{ habit.unit }}</span>
+						<span v-if="habit.goal" class="habit-goal">{{ negativityStatus(habit.negative)[0] }} {{ habit.displayGoal }} {{ habit.unit }}</span>
 					</div>
 					<div class="habit-actions">
 						<button class="action-button glassy" @click="populateForm(habit)">
@@ -93,7 +100,8 @@ const form = reactive({
 	goal: null,
 	unit: null,
 	clonedFrom: null,
-	'private': false
+	'private': false,
+	negative: false,
 })
 const isEditing = ref(false)
 const showSuggestions = ref(false);
@@ -135,7 +143,8 @@ async function addHabit() {
 			goal,
 			unit: form.unit,
 			clonedFrom: form?.clonedFrom?.id || form?.clonedFrom,
-			'private': form?.['private']
+			'private': form?.['private'],
+			'negative': form?.['negative']
 		})
 		console.log(status, data)
 		await refreshHabits();
@@ -179,6 +188,10 @@ const displayHabits = computed(() =>
 const privacyStatus = computed(() => {
 	return (isPrivate) => !isPrivate ? 'material-symbols:undereye-rounded' : 'streamline:invisible-1-solid'
 })
+const negativityStatus = computed(() => {
+	return (isNegative) => !isNegative ? ['Goal', 'icon-park-outline:positive-dynamics'] : ['Maximum Goal', 'pixelarticons:debug-off']
+})
+
 
 const dummyHabits = [
 { _id: 1, name: 'Wake up time', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
@@ -236,11 +249,11 @@ const dummyHabits = [
 	font-size: 1.1em;
 	margin: auto;
 }
-.habit-form #private {
-	display: inline-block;
+.form-bool {
+	display: inline-block !important;
 	/* justify-items: flex-start; */
 }
-#private > * {
+.form-bool > * {
 	/* display: inline; */
 	
 }
@@ -306,10 +319,6 @@ const dummyHabits = [
 	font-size: 1.1em;
 	text-align: center;
 	opacity: 0.7;
-}
-input[type=time]::-webkit-datetime-edit-ampm-field {
-	display: none;
-
 }
 
 
