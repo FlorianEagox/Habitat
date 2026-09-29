@@ -13,9 +13,9 @@ fragment HabitBase on Habit {
   datesCompleted
   private
   negative
+	priority
   owner {
-    id
-    username
+    ...UserCore
   }
 }
 
@@ -47,6 +47,7 @@ mutation addHabit(
   $clonedFrom: ID
   $private: Boolean
   $negative: Boolean
+  $priority: Int
 ) {
   addHabit(
     id: $id
@@ -58,12 +59,13 @@ mutation addHabit(
     clonedFrom: $clonedFrom
     private: $private
     negative: $negative
+    priority: $priority
   ) {
     ...HabitBase
     clonedFrom {
       ...HabitBase
       completeSfx
-    } # 👈 Extends the base fragment with the SFX!
+    }
   }
 }
 
@@ -72,8 +74,7 @@ mutation deleteHabit($id: ID) {
     id
     name
     owner {
-      id
-      username
+      ...UserCore
     }
   }
 }
@@ -160,5 +161,11 @@ query habits($owner: ID) {
       ...HabitBase
       completeSfx
     }
+  }
+}
+
+mutation swapPriorities($firstHabit: ID, $firstPriority: Int, $secondHabit: ID, $secondPriority: Int) {
+  swapPriorities(firstHabit: $firstHabit, firstPriority: $firstPriority, secondHabit: $secondHabit, secondPriority: $secondPriority) {
+    ...HabitBase
   }
 }

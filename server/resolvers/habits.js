@@ -12,12 +12,13 @@ export const resolvers = {
 		selectableHabits: () => getSelectableHabits()
 	},
 	Mutation: {
-		addHabit: (_, habit, context) => {console.log("hi i'm paul");  addHabit(context.user, habit)},
+		addHabit: (_, habit, context) => {console.log("hi i'm paul"); return addHabit(context.user, habit)},
 		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(context.user.id, habitId, date, degreeOfCompletion),
 		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),				
+		swapPriorities: (_, habitPriorities, {user}) => swapPriorities(user.id, ...Object.values(habitPriorities))
 	},
 	Habit: {
-    	owner: (habit) => {
+		owner: (habit) => {
 			if(!habit.owner) return null
 			return getUser(habit.owner) // <-- hydrate it here
 		},
@@ -36,7 +37,6 @@ export async function addHabit(user, habit) {
 		owner: user.id,
 		createdAt: habit.id ? undefined : new Date(),
 		updatedAt: new Date(),
-		datesCompleted: habit.datesCompleted || {},
 		_id: habit.id ? habit.id : new monk.id(),
 	}
 	const query = {_id: newHabit._id};
@@ -44,10 +44,13 @@ export async function addHabit(user, habit) {
 	try {
 		const habitRecord = await habits.update(
 			query,
-			{  $set: newHabit },
+			{
+				$set: newHabit,
+				$setOnInsert: { datesCompleted: {}}
+			},
 			{ upsert: true }
 		);
-		return newHabit;
+		return toPublic(newHabit);
 	} catch (err) {
 		console.error("AHHHH", err);
 		throw new Error('Error adding habit');
@@ -88,14 +91,14 @@ export async function completeHabit(userId, id, date, degreeOfCompletion) {
   const datesCompleted = habit.datesCompleted || {};
 
   if (degreeOfCompletion === null || degreeOfCompletion === false || degreeOfCompletion === undefined)
-    delete datesCompleted[date];
+	delete datesCompleted[date];
   else
-    datesCompleted[date] = degreeOfCompletion;
+	datesCompleted[date] = degreeOfCompletion;
   
   const updatedHabit = await habits.findOneAndUpdate(
-    { _id: id },
-    { $set: { datesCompleted, updatedAt: new Date() } },
-    { returnOriginal: false }
+	{ _id: id },
+	{ $set: { datesCompleted, updatedAt: new Date() } },
+	{ returnOriginal: false }
   );
   
   return toPublic(updatedHabit);
@@ -130,4 +133,11 @@ export async function getSelectableHabits() {
 
 export async function deleteHabit(user, habitId) {
 	return {'Habit': toPublic(await habits.findOneAndDelete({_id: habitId, owner: user.id}))}
+}
+
+export async function swapPriorities(userId, firstHabit, firstPriority, secondHabit, secondPriority) {
+	return toPublic([
+		await habits.findOneAndUpdate({_id: firstHabit, owner: userId}, {$set: {priority: firstPriority}}),
+		await habits.findOneAndUpdate({_id: secondHabit, owner: userId}, {$set: {priority: secondPriority}})
+	])
 }

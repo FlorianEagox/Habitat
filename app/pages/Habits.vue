@@ -1,28 +1,20 @@
 <template>
-	<div class="habits-page glassy">
+	<div class="habits-page">
 		<h2 class="metal">Manage Your Habits</h2>
 		<hr>
-		<form class="habit-form glowy-text" @submit.prevent="addHabit" novalidate>
-			<label>
+		<form class="habit-form glassy glowy-text" @submit.prevent="addHabit" novalidate>
+			<label class="area-name">
 				<span class="label-text">Habit Name</span>
 				<input v-model="form.name" class="glassy" placeholder="e.g. Take Walk" required />
 			</label>
-			<div id="suggest">
-				<input type="checkbox" id="btn-suggest" v-model="showSuggestions" />
-				<label for="btn-suggest">
-					<Icon name="material-symbols:dropdown-menu"/>
-					Show Suggestions
-				</label>
+			<div id="suggest" class="area-suggest">
+				<IconCheckbox v-model="showSuggestions" class="label-text" text="Show Suggestions" icon-name="material-symbols:dropdown-menu" :showCheckBox="false"/>
 				<select v-show="showSuggestions" v-model="selectedHabit" name="selected-habit" id="select-habit">
-					<option
-					v-for="habit in selectableHabits"
-					:key="habit.name"
-					:value="habit"
-					v-text="habit.name"
-					/>
+					<option v-for="habit in selectableHabits" :key="habit.name" :value="habit" v-text="habit.name" />
 				</select>
 			</div>
-			<label>
+
+			<label class="area-type">
 				<span class="label-text">Type</span>
 				<hr />
 				<select v-model="form.type" class="glassy">
@@ -31,58 +23,29 @@
 					<option value="BOOLEAN" selected="selected">Boolean</option>
 				</select>
 			</label>
-			<label v-if="form.type !== 'BOOLEAN'">
+
+			<label class="area-goal" v-if="form.type !== 'BOOLEAN'">
 				<span class="label-text" v-text:text="negativityStatus(form.negative)[0]" />
 				<input v-if="form.type == 'QUANTITY'" type='number' v-model="form.goal" min="1" class="glassy" />
-				<input v-else type="text"  v-model="form.goal" step="300" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="HH:MM" class="glassy"/>
+				<input v-else type="text" v-model="form.goal" step="300" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="HH:MM" class="glassy"/>
 			</label>
-			<label v-if="form.type == 'QUANTITY'">
+			<label class="area-unit" v-if="form.type == 'QUANTITY'">
 				<span class="label-text">Unit</span>
 				<input placeholder="pages, laps" v-model="form.unit" min="1" class="glassy" />
 			</label>
-			<label id="private" class="form-bool" for="chk-private">
-				<input type="checkbox" name="chk-private" id="chk-private" v-model="form['private']">
-				<span>
-					<Icon :name="privacyStatus(form['private'])" />
-					Make Private
-				</span>
-			</label>
-			<label id="negative" class="form-bool" for="chk-negative">
-				<input type="checkbox" name="chk-negative" id="chk-negative" v-model="form['negative']">
-				<span>
-					<Icon :name="negativityStatus(form['negative'])[1]" />
-					Negative Habit
-				</span>
-			</label>
+
+			<div class="area-bools">
+				<IconCheckbox id="private" v-model="form.private" text="Make Private" :icon-name="privacyStatus(form.private)" />
+				<IconCheckbox id="negative" v-model="form.negative" text="Negative Habit" :icon-name="negativityStatus(form.negative)[1]" />
+			</div>
+
 			<div class="actions">
 				<button class="glassy" type="submit">{{ isEditing ? 'Save' : 'Add Habit' }}</button>
 				<button class="glassy" type="button" @click="resetForm" v-if="isEditing">Cancel</button>
 			</div>
 		</form>
-		<div class="habits-list">
-			<h3 class="metal">Current Habits</h3>
-			<ul>
-				<li v-for="habit in displayHabits" :key="habit.id" class="habit-item glassy" v-bind:class="{'danger': habit.negative}">
-					<Icon :name="privacyStatus(habit?.private)" class="habit-privacy"/>
-					<div class="habit-info">
-						<span class="habit-name">{{ habit.name }}</span>
-						<span class="habit-type">{{ habit.type }}</span>
-						<span v-if="habit.goal" class="habit-goal">{{ negativityStatus(habit.negative)[0] }} {{ habit.displayGoal }} {{ habit.unit }}</span>
-					</div>
-					<div class="habit-actions">
-						<button class="action-button glassy" @click="populateForm(habit)">
-							<Icon name="material-symbols:box-edit-outline"/>
-							Edit
-						</button>
-						<button class="glassy action-button danger" @click="removeHabit(habit.id)">
-							<Icon name="material-symbols:delete-outline"/>
-							Delete
-						</button>
-					</div>
-				</li>
-			</ul>
-			<p v-if="habits.length === 0" class="empty-text">No habits added yet. You're life, cast adift in the black sea, clinging to the splintering raft that is your crumbling foundation. <br> Add a habit above!</p>
-		</div>
+		
+		<habits-list :habits="habits" @edit="populateForm" @remove="removeHabit"/>
 	</div>
 </template>
 
@@ -177,47 +140,59 @@ async function removeHabit(id) {
 	await refreshHabits()
 }
 
-const displayHabits = computed(() =>
-	habits.value.map(habit => ({
-		...habit,
-		displayGoal: habit.type === "DURATION"
-			? habit.goal?.toFixed(2).replace('.', ':')
-			: habit.goal
-	}))
-)
-const privacyStatus = computed(() => {
-	return (isPrivate) => !isPrivate ? 'material-symbols:undereye-rounded' : 'streamline:invisible-1-solid'
-})
-const negativityStatus = computed(() => {
-	return (isNegative) => !isNegative ? ['Goal', 'icon-park-outline:positive-dynamics'] : ['Maximum Goal', 'pixelarticons:debug-off']
-})
 
+function privacyStatus(isPrivate) {
+	return !isPrivate ? 'material-symbols:undereye-rounded' : 'streamline:invisible-1-solid'	
+}
 
-const dummyHabits = [
-{ _id: 1, name: 'Wake up time', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 8 },
-{ _id: 2, name: 'Play Piano', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.5, goal: 30 },
-{ _id: 3, name: 'Read Book', type: 'quantity', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.75, goal: 100 },
-{ _id: 4, name: 'Exercise', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.2, goal: 60 },
-{ _id: 5, name: 'Meditate', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.9, goal: 15 },
-{ _id: 6, name: 'Take Medication', type: 'boolean', datesCompleted: {}, completedToday: false, degreeOfCompletion: 1 },
-{ _id: 7, name: 'Journal', type: 'duration', datesCompleted: {}, completedToday: false, degreeOfCompletion: 0.8, goal: 20 },
-]
+function negativityStatus(isNegative) {
+	return !isNegative ? ['Goal', 'icon-park-outline:positive-dynamics'] : ['Maximum Goal', 'pixelarticons:debug-off']	
+}
 
 </script>
 
-<style>
+<style scoped>
 .habits-page {
 	margin: 2em auto;
-	padding: 2em;
 	z-index: 1;
+	position: relative;
 }
+h2 {
+	position: absolute;
+	top: reset;
+	z-index: 2;
+}
+
 .habit-form {
+	padding: 2em;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+	grid-template-areas:
+		"name    suggest"
+		"type    type"
+		"goal    unit"
+		"bools   bools"
+		"actions actions";
 	gap: 1em 2em;
 	margin-bottom: 2em;
 	align-items: end;
 }
+
+.area-name    { grid-area: name; }
+.area-suggest { grid-area: suggest; align-self: end; }
+.area-type    { grid-area: type; }
+.area-goal    { grid-area: goal; }
+.area-unit    { grid-area: unit; }
+.area-bools   { grid-area: bools; }
+
+.area-bools {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+	gap: 2em;
+	align-items: center;
+}
+
 #suggest input {
 	display: none;
 }
@@ -233,8 +208,11 @@ const dummyHabits = [
 	text-shadow: 0 0 5px hsla(var(--purple), 1);
 }
 .label-text {
-	margin-bottom: 0.3em;
+	margin-bottom: 0.4em;
 	font-size: 1.1em;
+	text-align: center;
+	display: block;
+	width: 100%;
 }
 .habit-form input,
 .habit-form select {
@@ -248,6 +226,9 @@ const dummyHabits = [
 	padding: 0.5em 1em;
 	font-size: 1.1em;
 	margin: auto;
+}
+.habit-form select {
+	display: block;
 }
 .form-bool {
 	display: inline-block !important;
@@ -263,55 +244,10 @@ const dummyHabits = [
 	justify-content: center;
 	gap: 1em;
 	margin-top: 1em;
+	grid-area: actions;
 }
-.habits-list {
-	margin-top: 2em;
-}
-.habits-list h3 {
-	margin-bottom: 1em;
-	font-family: "Fredoka One", Arial, sans-serif;
-	color: hsl(var(--electro));
-	text-shadow: 0 0 8px var(--citrus);
-}
-.habits-list ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	display: grid;
-	gap: 1em;
-}
-.habit-item {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: rgba(200, 200, 255, 0.08);
-	border-radius: 15px;
-	padding: 1em 1.5em;
-	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-	font-size: 1.1em;
-}
-.habit-info {
-	display: flex;
-	flex-direction: column;
-	gap: 0.2em;
-}
-.habit-name {
-	font-weight: bold;
-	color: hsl(var(--citrus));
-	font-size: 1.2em;
-	text-shadow: 0 0 5px hsla(var(--purple), 1);
-}
-.habit-privacy {
-	flex: 0 0 10%;
-}
-.habit-type, .habit-goal, .habit-progress {
-	font-size: 0.95em;
-	color: hsl(var(--electro));
-}
-.habit-actions {
-	display: flex;
-	gap: 0.7em;
-}
+
+
 
 .empty-text {
 	margin-top: 2em;
