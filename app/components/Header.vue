@@ -73,7 +73,16 @@ const splashTexts = [
 	"#VapeNation",
 	"Go Piss, Girl!",
 	"Don't Murder Today",
-	"Zuko, you must look within yourself to save yourself from your other self. Only then will your true self reveal itself"
+	"Zuko, you must look within yourself to save yourself from your other self. Only then will your true self reveal itself",
+	"This too shall come to pass",
+	"What are YOU doing here?",
+	"About time you showed up",
+	"It never ends",
+	"Look how far you've come",
+	"After everything it's still you",
+	"It FILLS you with determination",
+	"Don't Murder Today",
+	"Tell a friend"
 ];
 const splashText = computed(() => {
 	return splashTexts[Math.floor(Math.random() * splashTexts.length)];
@@ -129,7 +138,7 @@ const session = authClient.useSession();
 		text-shadow: -1px -2px hsl(53, 100%, 81%), 3px 3px hsl(240, 90%, 61%);
 	}
 	img {
-		max-width: 100px;
+		max-height: 100px;
 		object-fit: scale-down;
 	}
 	img:last-of-type {

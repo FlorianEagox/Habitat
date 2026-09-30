@@ -7,7 +7,7 @@
 			v-for="habit in displayHabits"
 			:key="habit.id"
 			class="habit-item glassy"
-			v-bind:class="{'danger': habit.negative, 'swappable': habit.id == currentSwap?.id}"
+			v-bind:class="{'danger': habit?.negative, 'swappable': habit.id == currentSwap?.id}"
 			draggable="true"
 			@dragstart="dragging = habit"
 			@dragover.prevent="currentSwap = habit"
@@ -36,31 +36,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import useHabits from '~/composables/habits'
 
 const toggleGrid = ref(false)
 const currentSwap = ref(null)
 const dragging = ref(null)
-
-const props = defineProps({
-	habits: {
-		type: Array,
-		default: () => []
-	}
-})
+const {habits, displayHabits, refreshHabits} = useHabits()
 
 const emit = defineEmits(['edit', 'remove'])
-
-const displayHabits = computed(() =>
-	props.habits
-		.map((habit, i) => ({
-			...habit,
-			displayGoal: habit.type === "DURATION"
-				? habit.goal?.toFixed(2).replace('.', ':')
-				: habit.goal,
-			order: habit.priority ?? i
-		}))
-		.sort((a, b) => a.order - b.order)
-)
 
 
 function privacyStatus(isPrivate) {
@@ -78,16 +61,16 @@ function populateForm(habit) {
 function removeHabit(id) {
 	emit('remove', id)
 }
-function swapHabitPriorities(habit) {
-	const draggingIndex = props.habits.findIndex(e => e.id == dragging.value.id)
-	const dropIndex = props.habits.findIndex(e => e.id == currentSwap.value.id);
-	props.habits[draggingIndex] = currentSwap.value
-	props.habits[dropIndex] = dragging.value
+async function swapHabitPriorities(habit) {
+	const draggingIndex = displayHabits.value.findIndex(e => e.id == dragging.value.id)
+	const dropIndex = displayHabits.value.findIndex(e => e.id == currentSwap.value.id);
 	GqlSwapPriorities({
 		firstHabit: currentSwap.value.id, firstPriority: draggingIndex, 
 		secondHabit: dragging.value.id, secondPriority: dropIndex
 	});
 	currentSwap.value = null;
+	sfxStore().randomSfxFromCategory('sortHabit')
+	await refreshHabits()
 }
 </script>
 

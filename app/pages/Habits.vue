@@ -45,7 +45,7 @@
 			</div>
 		</form>
 		
-		<habits-list :habits="habits" @edit="populateForm" @remove="removeHabit"/>
+		<habits-list @edit="populateForm" @remove="removeHabit"/>
 	</div>
 </template>
 
@@ -55,6 +55,7 @@ import { useState } from '#app'
 import { HabitTypes } from '#gql/default'
 import globalHabits from '~/assets/selectableHabits'
 import { formatFloatToDuration, parseDurationToFloat } from '~/utils/textRendering'
+import useHabits from '~/composables/habits'
 
 const form = reactive({
 	_id: null,
@@ -68,7 +69,8 @@ const form = reactive({
 })
 const isEditing = ref(false)
 const showSuggestions = ref(false);
-const selectableHabits = useState('selectableHabits', () =>  [])// globalHabits)
+
+const selectableHabits = (await GqlSelectableHabits()).selectableHabits
 const selectedHabit = ref({})
 
 watch(selectedHabit, (newHabit) => {
@@ -110,7 +112,7 @@ async function addHabit() {
 			'negative': form?.['negative']
 		})
 		console.log(status, data)
-		await refreshHabits();
+		await useHabits().refreshHabits()
 		resetForm()
 		sfxStore().randomSfxFromCategory('addHabit')
 	} catch (error) {
@@ -118,16 +120,6 @@ async function addHabit() {
 		return
 	}
 }
-
-const habits = useState('habits', () => [])
-
-
-async function refreshHabits() {
-	habits.value = (await GqlHabits()).habits
-	selectableHabits.value = (await GqlSelectableHabits()).selectableHabits
-}
-
-onMounted(async () => await refreshHabits());
 
 function populateForm(h) {
 	h.goal = formatFloatToDuration(h.goal)
@@ -137,7 +129,7 @@ function populateForm(h) {
 
 async function removeHabit(id) {
 	await GqlDeleteHabit({id})
-	await refreshHabits()
+	await useHabits().refreshHabits()
 }
 
 

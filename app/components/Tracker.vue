@@ -6,7 +6,7 @@
 		<hr>
 		<div class="glowy-text" id="habits-grid">
 			<div id="headings">
-				<span>Habbit</span>
+				<span>Habit</span>
 				<span class="day-heading" v-for="date in listedDayHeadings" :key="date" v-text="date"></span>
 			</div>
 			<div v-for="habit in habits" :key="habit.name" class="habit" v-if="habits.length > 0" draggable="true">
@@ -45,23 +45,24 @@
 </template>
 
 <script setup>
-	import { ref, computed, onMounted, watch } from 'vue'
+	import { ref, computed, onMounted } from 'vue'
+import useHabits from '~/composables/habits'
 	import { sfxStore } from '~/stores/SoundManager'
 	import { parseDurationToFloat, formatFloatToDuration } from '~/utils/textRendering'
 
 	const props = defineProps({
 		friendId: String
 	})
+	const habits = useHabits(props.friendId).displayHabits
 	const friend = ref({})
 	const today = new Date()
 	const daysToShow = 7
+
 	const listedDates = Array.from({ length: daysToShow }, (_, i) =>  {
 		const d = new Date(new Date().setDate(today.getDate() - i))
 		d.setUTCHours(0,0,0,0)
 		return d
 	})
-
-	const habits = ref([])
 
 	const listedDayHeadings = computed(() => 
 		listedDates.map(date =>
@@ -100,26 +101,6 @@
 		}
 	}
 
-
-	async function hydrateHabitData() {
-		const fetchedHabits = (await GqlHabits({owner: props?.friendId}))
-		habits.value = fetchedHabits.habits
-		if(props.friendId)
-			friend.value = habits.value[0].owner
-		else {
-			friend.value = {}
-		}
-	}
-
-
-	onMounted(async () => {
-		hydrateHabitData();
-		
-	})
-
-	watch(() => props.friendId, () => {
-		hydrateHabitData();
-	})
 </script>
 
 <style scoped>
@@ -133,8 +114,8 @@
 	}
 	#tracker h2 {
 		/* text-align: center; */
-		padding: 0.25em;
-		margin: 0.25em;
+		/* padding: 0.25em; */
+		/* margin: 0.25em; */
 	}
 	#tracker::before {
 		content: "";
@@ -163,6 +144,7 @@
 		z-index: 1; /* ensure content sits above the background */
 	}
 	#habits-grid {
+		padding-top: 0;
 		display: grid;
 		grid-template-columns: auto repeat(7, 1fr);
 		grid-template-rows: auto;
@@ -189,25 +171,29 @@
 		grid-column: 1 / -1;
 		text-align: center;
 	}
+
 	.habit {
 		display: contents;
 	}
+
 	.habit-day {
 		display: flex;
+	}
+	input[type="checkbox"] {		
+		width: 20px;
+		height: 20px;
+		justify-self: flex-start;
+		/* margin: 0 auto; */
+		/* padding: 30px; */
+		cursor: pointer;
 	}
 	.optional-quantity {
 		display: inline;
 		min-width: 0;
-	}
-	input[type="checkbox"] {
-		width: 20px;
-		height: 20px;
-		margin: 0 auto;
-		padding: 30px;
-		cursor: pointer;
+		align-self: flex-end;
 	}
 	input[type="checkbox"]:disabled {
-		pointer-events: none; /* Prevents mouse clicks entirely */
+		pointer-events: none;
 	}
 	input[type="number"],
 	input[type="time"],
@@ -229,10 +215,7 @@
 		width:100%;
 		font-size: 0.8em;
 	}
-	input:read-only {
-		flex: 1 0 auto;
-		width: 100%;
-	}
+	
 	@media (max-width: 768px) {
 		#tracker {
 			width: 90%;
