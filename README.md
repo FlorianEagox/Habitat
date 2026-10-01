@@ -13,17 +13,18 @@ Make an account and add all the things you'd like to spend your life doing, and 
 
 
 ## Features to come
+- ###REMAKE ALL THE ART IN BLENDER YOU'RE AN ARTIST GODAMNIT, DRAIN THE SLOP!
 - Insights page to show graphs of progress over time
     - Graph of each habit completion over  time
     - Good vs bad breakdown
 - NFC Tag support to complete habits with WEBHOOKS! (come on this one is fucking awesome you know it)
 - Stories? Like milestone tracking where you can upload a picture, or share a note
-- Points system based on how based on hitting goals?
+- ~~Points system based on how based on hitting goals?~~
 - Streaks tracking, that shows the longest you've done a habit as a streak. and your current record
 - Weekly goals / totals in addition to daily goals
 - ~~Big list of habits to suggest --~~
 - Export to social media button to flex
-- ~~Negative habits, things you want to disincentivize~~~
+- ~~Negative habits, things you want to disincentivize~~
 - Nightly notification to remind users to log their day
 - PWA Support
 - Optional LLM coaching features that give feedback based on your progress and suggest strategies to better integrate certain habits into your life

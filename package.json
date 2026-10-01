@@ -40,6 +40,6 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "sass": "^1.104.1"
+    "sass": "^1.105.1"
   }
 }

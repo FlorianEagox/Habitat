@@ -15,7 +15,7 @@ export const authClient = createAuthClient({});
 	</div>
 </template>
 
-<style>
+<style lang="scss">
 	* {
 		margin: 0;
 		padding: 0;

@@ -2,9 +2,15 @@
 import { router } from 'better-auth/api';
 import { authClient } from '~/app.vue';
 import defaultAvatar from '~/assets/sexysisyphus2.png'  
+import useHabits from '~/composables/habits';
 const userId = (await authClient.useSession(useFetch)).data.value.user.id
 const userInfo = (await GqlUser({id: userId})).user
-const friends = userInfo.friends
+let friends = userInfo.friends
+friends = await Promise.all(friends.map(async friend => {
+    const { points, refreshHabits } = useHabits(friend.user.id)
+    await refreshHabits()
+    return { ...friend, maxPoints: points.value.totalPoints }
+}))
 const queryName = ref('')
 const friendSearch = ref('');
 const foundFriends = ref([])
@@ -46,7 +52,10 @@ async function acceptFriendRequest(event, friendId) {
             <li class="friend" v-for="friend in friends">
                <h3 v-text="friend.user.username"/>
                <button id="btn-accept-friend" class="action-button glassy" v-if="friend.status == 'PENDING'" @click="acceptFriendRequest($event, friend.user.id)">Accept</button>
-               <button id="btn-view-graph" class="action-button glassy" v-else-if="friend.status == 'ACCEPTED'" @click="navigateTo({path: '/tracker', query: {friendId: friend.user.id}})">View Habits</button>
+               <div class="friends-options" v-else-if="friend.status == 'ACCEPTED'">
+                    <span class="friend-points" v-text="friend.maxPoints"/>
+                   <button id="btn-view-graph" class="action-button glassy"@click="navigateTo({path: '/tracker', query: {friendId: friend.user.id}})">View Habits</button>
+               </div>
                <p class="friend-pending" v-else>Awaiting Friend Request</p>
             </li>
         </ul>

@@ -15,7 +15,7 @@ definePageMeta({
 	requireAuth: true
 });
 </script>
-<style>
+<style lang="scss">
 	#dashboard {
 		display: flex;
 		flex-direction: row;

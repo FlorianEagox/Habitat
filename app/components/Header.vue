@@ -82,7 +82,13 @@ const splashTexts = [
 	"After everything it's still you",
 	"It FILLS you with determination",
 	"Don't Murder Today",
-	"Tell a friend"
+	"Tell a friend",
+	"100% Gourmet Code",
+	"Speedrun your Glowup",
+	"Whatcha doooin? )UvU)",
+	"Respec your skilltree",
+	"The missile knows where it is, do you?",
+	"Tessa's Game of Life"
 ];
 const splashText = computed(() => {
 	return splashTexts[Math.floor(Math.random() * splashTexts.length)];
