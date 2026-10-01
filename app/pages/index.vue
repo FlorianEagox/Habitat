@@ -1,10 +1,7 @@
 <script setup>
-import { useTemplateRef, ref } from 'vue';
-
 definePageMeta({
   layout: 'logged-out'
 })
-const showSun = ref(false)
 </script>
 
 <template>
@@ -15,15 +12,15 @@ const showSun = ref(false)
 				<section id="description">
 					<p>All change starts from the bottom up. No matter your material circumstances, there are simple things you can do for yourself that make you more prepared to achieve difficult things. It's time to start becoming the person you want to be.</p>
 					<p>Set goals, track your progress, and invite friends to keep eachother accountable. Stop pushing that boulder up the hill; roll it down the other side!</p>
-					<button @click="showSun = true"><span class="metal raised">Chase the Rising Sun</span></button>
+					<button type="button" onclick="const panel=document.getElementById('auth-panel');panel.hidden=false;requestAnimationFrame(()=>{panel.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'center'});panel.querySelector('input:not([type=hidden])')?.focus({preventScroll:true})})"><span class="metal raised">Chase the Rising Sun</span></button>
 				</section>
 				    <!-- <button @click="openInPopup('/auth/github')">Login with GitHub</button> -->
 				<img src="~/assets/sexysisyphus.png" alt="Sisyphus is vibing and sexy today chilling in the vaporwave sunset. He's got this." />
 			</div>
 		</article>
-			<client-only>
-				<Auth v-if="showSun"/>
-			</client-only>
+		<div id="auth-panel" hidden>
+			<Auth />
+		</div>
 	</main>
 </template>
 
@@ -98,6 +95,32 @@ const showSun = ref(false)
 	}
 	#auth {
 		margin: 4em auto;
+	}
+	#auth-panel {
+		display: flex;
+		justify-content: center;
+		width: 100%;
+	}
+	#auth-panel[hidden] {
+		display: none;
+	}
+	#auth-panel:not([hidden]) {
+		animation: auth-rise 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+	}
+	@keyframes auth-rise {
+		from {
+			opacity: 0;
+			transform: translateY(45vh);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		#auth-panel:not([hidden]) {
+			animation: none;
+		}
 	}
 
 	@media (max-width: 768px) {

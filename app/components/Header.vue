@@ -88,16 +88,22 @@ const splashTexts = [
 	"Whatcha doooin? )UvU)",
 	"Respec your skilltree",
 	"The missile knows where it is, do you?",
-	"Tessa's Game of Life"
+	"Tessa's Game of Life",
+	"Good girl? *click*",
+	"NFC-Enabled Trombone"
 ];
 const splashText = computed(() => {
 	return splashTexts[Math.floor(Math.random() * splashTexts.length)];
 });
-function triggerLogout() {
-	authClient.signOut({fetchOptions: {
-		onSuccess: () => navigateTo('/'),
-		onError: console.log
-	}})
+async function triggerLogout() {
+	try {
+		const { error } = await authClient.signOut()
+		if (error) throw error
+		await session.value.refetch()
+		await navigateTo('/')
+	} catch (error) {
+		console.error('Failed to log out', error)
+	}
 }
 const session = authClient.useSession();
 </script>

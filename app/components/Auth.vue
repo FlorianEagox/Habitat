@@ -1,14 +1,11 @@
 <script setup>
-import { ref, onMounted, useTemplateRef, nextTick } from 'vue';
+import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { authClient } from '../app.vue'
 
 const tab = ref('register');
 
 const token = useRoute().query?.token || null
-// refs for registration
-const txtUsername = useTemplateRef("txtUsername");
-const btnSignUp = useTemplateRef("btnSignUp")
 const registerUsername = ref('');
 const registerEmail = ref('');
 const registerPassword = ref('');
@@ -18,44 +15,48 @@ const loginPassword = ref('');
 const newPassword = ref('');
 
 const fuckies = ref('');
+const isSubmitting = ref(false)
+const session = authClient.useSession()
 
-async function handleRegister(e) {
-	e.preventDefault();
-	const {data, error} = await authClient.signUp.email({
-		email: registerEmail.value,
-		name: registerUsername.value, 
-		password: registerPassword.value
-	}, {
-		onSuccess: () => navigateTo('/tracker'),
-		onError: (ctx) => fuckies.value = ctx.error.message
-	})
-}
-async function handleLogin(e) {
-	e.preventDefault()
-	const {data, error} = await authClient.signIn.email(
-		{ email: loginUser.value, password: loginPassword.value }, 
-		{ 
-			onSuccess: () => navigateTo('/tracker'),
-			onError: (ctx) => fuckies.value = ctx.error.message
+async function authenticate(request) {
+	if (isSubmitting.value) return
+	isSubmitting.value = true
+	fuckies.value = ''
+	try {
+		const { error } = await request()
+		if (error) {
+			fuckies.value = error.message
+			return
 		}
-	);
+		await session.value.refetch()
+		await navigateTo('/tracker')
+	} catch (error) {
+		fuckies.value = error.message || 'Unable to sign in right now.'
+	} finally {
+		isSubmitting.value = false
+	}
 }
-async function passwordReset(e) {
-	e.preventDefault()
+
+function handleRegister() {
+	return authenticate(() => authClient.signUp.email({
+		email: registerEmail.value,
+		name: registerUsername.value,
+		password: registerPassword.value
+	}))
+}
+
+function handleLogin() {
+	return authenticate(() => authClient.signIn.email({
+		email: loginUser.value,
+		password: loginPassword.value
+	}))
+}
+async function passwordReset() {
 	await authClient.resetPassword({newPassword: newPassword.value, token}, {
 		onSuccess: () => fuckies.value = "Password Reset, Don't loose it again, or do, i don't care, i mean I programmed this whole flow just in case you started showing signs of dementia, so I care a little bit I guess?",
 		onError: ctx => fuckies.value = ctx.error.message
 	})
 }
-onMounted(async () => {
-	// await nextTick();
-	setTimeout(() => {
-		if(txtUsername.value)
-			txtUsername.value.focus({preventScroll: true})
-
-		btnSignUp.value.scrollIntoView({behavior: 'smooth', block: 'nearest'})
-	}, 100)
-});
 </script>
 
 <template>
@@ -67,27 +68,27 @@ onMounted(async () => {
 			<input type="radio" name="tabSelection" id="tabLogin" value="login" v-model="tab" hidden>
 			<label for="tabLogin"><h3>Log In</h3></label>
 		</div>
-		<form v-if="tab == 'register'" action="">
+		<form v-if="tab == 'register'" @submit.prevent="handleRegister">
 			<label for="username" class="cheese">Choose a username</label>
-			<input type="text" id="username" class="glassy" v-model="registerUsername" name="username" ref="txtUsername" required/>
+			<input type="text" id="username" class="glassy" v-model="registerUsername" name="username" required/>
 			<label for="email">Email:</label>
 			<input type="email" id="email" class="glassy" v-model="registerEmail" name="email" required />
 			<label for="password">Password:</label>
 			<input type="password" id="password" class="glassy" v-model="registerPassword" required />
-			<button class="glassy" @click="handleRegister" ref="btnSignUp">Letsa go</button>
+			<button class="glassy" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Please wait...' : 'Letsa go' }}</button>
 		</form>
-		<form v-else action="">
+		<form v-else @submit.prevent="handleLogin">
 			<label for="loginUser">Email/Username:</label>
 			<input type="email" id="loginUser" class="glassy"  v-model="loginUser" name="user" required />
 			<label for="loginPassword">Password:</label>
 			<input type="password" id="loginPassword" class="glassy"  v-model="loginPassword" required />
-			<button class="glassy" @click="handleLogin">Letsa go</button>
+			<button class="glassy" type="submit" :disabled="isSubmitting">{{ isSubmitting ? 'Logging in...' : 'Letsa go' }}</button>
 			<a @click="authClient.requestPasswordReset({email: loginUser, redirectTo: $route.fullPath})">Forgot username/password?</a>
 		</form>
-		<form v-if="$route.query.token" id="reset" action="">
+		<form v-if="$route.query.token" id="reset" @submit.prevent="passwordReset">
 			<label for="resetPassword">New Password:</label>
 			<input type="password" id="resetPassword" class="glassy" v-model="newPassword" required />
-			<button class="glassy" @click="passwordReset">Reset Password</button>
+			<button class="glassy" type="submit">Reset Password</button>
 		</form>
 		<div id="fuckies" v-if="fuckies">Oopsie Poopsie: <span class="error-text" v-text="fuckies" /></div>
 	</div>

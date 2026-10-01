@@ -1,5 +1,4 @@
 <script setup>
-import { router } from 'better-auth/api';
 import { authClient } from '~/app.vue';
 import defaultAvatar from '~/assets/sexysisyphus2.png'  
 import useHabits from '~/composables/habits';
@@ -9,7 +8,7 @@ let friends = userInfo.friends
 friends = await Promise.all(friends.map(async friend => {
     const { points, refreshHabits } = useHabits(friend.user.id)
     await refreshHabits()
-    return { ...friend, maxPoints: points.value.totalPoints }
+    return { ...friend, points: points.value.totalPoints }
 }))
 const queryName = ref('')
 const friendSearch = ref('');
@@ -30,8 +29,8 @@ async function acceptFriendRequest(event, friendId) {
     <div id="friends" class="glassy">
         <h2 class="metal">Friends</h2>
         <div id="friend-search" class="habit-form">
-            <h3>Find a Friend</h3>
-            <input type="text" id="txt-add-friend" class="glassy" v-model="queryName" @keypress="searchFriends" placeholder="tessa">
+            <h3 class="form-label-text">Find a Friend</h3>
+            <input type="text" id="txt-add-friend" class="form-control glassy" v-model="queryName" @keypress="searchFriends" placeholder="tessa">
             <ul id="found-friends">
                 <li v-for="friend in foundFriends" :key="friend.id">
                     <img :src="friend.avatar || defaultAvatar" />
@@ -53,7 +52,7 @@ async function acceptFriendRequest(event, friendId) {
                <h3 v-text="friend.user.username"/>
                <button id="btn-accept-friend" class="action-button glassy" v-if="friend.status == 'PENDING'" @click="acceptFriendRequest($event, friend.user.id)">Accept</button>
                <div class="friends-options" v-else-if="friend.status == 'ACCEPTED'">
-                    <span class="friend-points" v-text="friend.maxPoints"/>
+                       <span class="friend-points">{{ Math.round(friend.points) }} Points</span>
                    <button id="btn-view-graph" class="action-button glassy"@click="navigateTo({path: '/tracker', query: {friendId: friend.user.id}})">View Habits</button>
                </div>
                <p class="friend-pending" v-else>Awaiting Friend Request</p>
@@ -91,6 +90,9 @@ async function acceptFriendRequest(event, friendId) {
         max-width: 90px;
         max-height: 90px;
         border-radius: 30px;
+    }
+    .friends-options {
+        display: contents;
     }
     @media (max-width: 768px) {
         #friends {

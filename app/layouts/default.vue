@@ -60,6 +60,34 @@ definePageMeta({
 		background: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
 		color: hsl(var(--citrus));
 	}
+	.form-label {
+		display: flex;
+		flex-direction: column;
+		font-weight: bold;
+		color: hsl(var(--citrus));
+		text-shadow: 0 0 5px hsla(var(--purple), 1);
+	}
+	.form-label-text {
+		margin-bottom: 0.4em;
+		font-size: 1.1em;
+		text-align: center;
+		display: block;
+		width: 100%;
+	}
+	.form-control {
+		color: var(--citrus);
+		border: none;
+		border-bottom: 3px dashed hsla(var(--electro), 0.7);
+		background: none;
+		border-radius: 5px;
+		margin: auto;
+		text-shadow: inherit;
+		padding: 0.5em 1em;
+		font-size: 1.1em;
+	}
+	select.form-control {
+		display: block;
+	}
 	
 	@media (max-width: 768px) {
 		#dashboard {

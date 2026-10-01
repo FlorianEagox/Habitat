@@ -3,35 +3,35 @@
 		<h2 class="metal">Manage Your Habits</h2>
 		<hr>
 		<form class="habit-form glassy glowy-text" @submit.prevent="addHabit" novalidate>
-			<label class="area-name">
-				<span class="label-text">Habit Name</span>
-				<input v-model="form.name" class="glassy" placeholder="e.g. Take Walk" required />
+			<label class="form-label area-name">
+				<span class="form-label-text">Habit Name</span>
+				<input v-model="form.name" class="form-control glassy" placeholder="e.g. Take Walk" required />
 			</label>
 			<div id="suggest" class="area-suggest">
-				<IconCheckbox v-model="showSuggestions" class="label-text" text="Show Suggestions" icon-name="material-symbols:dropdown-menu" :showCheckBox="false"/>
-				<select v-show="showSuggestions" v-model="selectedHabit" name="selected-habit" id="select-habit">
+				<IconCheckbox v-model="showSuggestions" class="form-label-text" text="Show Suggestions" icon-name="material-symbols:dropdown-menu" :showCheckBox="false"/>
+				<select v-show="showSuggestions" v-model="selectedHabit" name="selected-habit" id="select-habit" class="form-control">
 					<option v-for="habit in selectableHabits" :key="habit.name" :value="habit" v-text="habit.name" />
 				</select>
 			</div>
 
-			<label class="area-type">
-				<span class="label-text">Type</span>
+			<label class="form-label area-type">
+				<span class="form-label-text">Type</span>
 				<hr />
-				<select v-model="form.type" class="glassy">
+				<select v-model="form.type" class="form-control glassy">
 					<option value="DURATION">Duration/Time</option>
 					<option value="QUANTITY">Quantity</option>
 					<option value="BOOLEAN" selected="selected">Boolean</option>
 				</select>
 			</label>
 
-			<label class="area-goal" v-if="form.type !== 'BOOLEAN'">
-				<span class="label-text" v-text:text="negativityStatus(form.negative)[0]" />
-				<input v-if="form.type == 'QUANTITY'" type='number' v-model="form.goal" min="1" class="glassy" />
-				<input v-else type="text" v-model="form.goal" step="300" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="HH:MM" class="glassy"/>
+			<label class="form-label area-goal" v-if="form.type !== 'BOOLEAN'">
+				<span class="form-label-text" v-text:text="negativityStatus(form.negative)[0]" />
+				<input v-if="form.type == 'QUANTITY'" type='number' v-model="form.goal" min="1" class="form-control glassy" />
+				<input v-else type="text" v-model="form.goal" step="300" pattern="[0-9]{1,2}:[0-9]{2}" placeholder="HH:MM" class="form-control glassy"/>
 			</label>
-			<label class="area-unit" v-if="form.type == 'QUANTITY'">
-				<span class="label-text">Unit</span>
-				<input placeholder="pages, laps" v-model="form.unit" min="1" class="glassy" />
+			<label class="form-label area-unit" v-if="form.type == 'QUANTITY'">
+				<span class="form-label-text">Unit</span>
+				<input placeholder="pages, laps" v-model="form.unit" min="1" class="form-control glassy" />
 			</label>
 
 			<div class="area-bools">
@@ -185,6 +185,11 @@ h2 {
 	align-items: center;
 }
 
+.habit-form .form-bool {
+	color: hsl(var(--citrus));
+	text-shadow: 0 0 5px hsla(var(--purple), 1);
+}
+
 #suggest input {
 	display: none;
 }
@@ -192,36 +197,6 @@ h2 {
 	display: block;
 }
 
-.habit-form label {
-	display: flex;
-	flex-direction: column;
-	font-weight: bold;
-	color: hsl(var(--citrus));
-	text-shadow: 0 0 5px hsla(var(--purple), 1);
-}
-.label-text {
-	margin-bottom: 0.4em;
-	font-size: 1.1em;
-	text-align: center;
-	display: block;
-	width: 100%;
-}
-.habit-form input,
-.habit-form select {
-	color: var(--citrus);
-	border: none;
-	border-bottom: 3px dashed hsla(var(--electro), 0.7);
-	background: none;
-	border-radius: 5px;
-	margin: auto;
-	text-shadow: inherit;
-	padding: 0.5em 1em;
-	font-size: 1.1em;
-	margin: auto;
-}
-.habit-form select {
-	display: block;
-}
 .form-bool {
 	display: inline-block !important;
 	/* justify-items: flex-start; */
