@@ -19,8 +19,9 @@
 					<span class="optional-quantity" v-if="date.getTime() in habit.datesCompleted">
 						<input type="text" 
 						class="glassy"
+						:class="{'tracking': habit.automaticTracking && date.getTime() == new Date().setUTCHours(0,0,0,0)}"
 						:placeholder="formatFloatToDuration(habit.goal)"
-						:value="formatFloatToDuration(habit.datesCompleted[date.getTime()])"
+						:value="displayTrackedDuration(habit, date)"
 						pattern="[0-9]{1,3}:[0-9]{2}"
 						title="Hours:Minutes (e.g., 1:30)"
 						v-if="habit.type === 'DURATION'"
@@ -57,7 +58,7 @@ import useHabits from '~/composables/habits'
 	const friend = ref({})
 	const today = new Date()
 	const daysToShow = 7
-
+	const now = ref(Date.now())
 	const listedDates = Array.from({ length: daysToShow }, (_, i) =>  {
 		const d = new Date(new Date().setDate(today.getDate() - i))
 		d.setUTCHours(0,0,0,0)
@@ -101,6 +102,19 @@ import useHabits from '~/composables/habits'
 		}
 	}
 
+	function displayTrackedDuration(habit, date) {
+		if((habit.automaticTracking || false) && date.getTime() == new Date().setUTCHours(0,0,0,0)) {
+			const elapsed = (now.value - new Date(parseInt(habit.updatedAt))) / (1000 * 60 * 60)
+			return formatFloatToDuration(habit.datesCompleted[date.getTime()] + elapsed) + `:${Math.floor((elapsed * 3600) % 60).toString().padStart(2, '0')}`
+		}
+		return formatFloatToDuration(habit.datesCompleted[date.getTime()])
+	}
+	
+	onMounted(() => {
+		const updateLiveTrackedHabit = setInterval(() => {
+			now.value = Date.now()
+		}, 1000)
+	})
 </script>
 
 <style scoped>
@@ -215,7 +229,11 @@ import useHabits from '~/composables/habits'
 		width:100%;
 		font-size: 0.8em;
 	}
-	
+	.tracking {
+		border: 3px solid green !important;
+		background-color: green !important;
+	}
+
 	@media (max-width: 768px) {
 		#tracker {
 			width: 90%;

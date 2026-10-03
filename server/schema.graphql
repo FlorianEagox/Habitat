@@ -39,12 +39,14 @@ type Habit {
 	goal: Float
 	unit: String
 	createdAt: String
+	updatedAt: String
 	datesCompleted: JSON
 	clonedFrom: Habit
 	timeScaler: Float
 	negative: Boolean
 	priority: Int
 	completeSfx: String
+	automaticTracking: Boolean
 }
 
 type Query {
@@ -65,4 +67,5 @@ type Mutation {
 	completeHabit(habitId: ID!, date: BigInt!, degreeOfCompletion: BoolOrFloat): Habit
 	addFriend(friendId: ID!, status: FriendRequestStatus!): User
 	swapPriorities(firstHabit: ID, firstPriority: Int, secondHabit: ID, secondPriority: Int): [Habit]
+	requestAutomationUrl(habitId: ID!): String
 }

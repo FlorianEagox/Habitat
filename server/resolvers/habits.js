@@ -3,6 +3,7 @@ import { getUser } from './users';
 import monk from 'monk';
 import selectableHabits from '@/assets/selectableHabits.js'
 import { parseDurationToFloat, formatFloatToDuration } from '@/utils/textRendering'
+import crypto from 'crypto'
 
 const habits = db.get('habits');
 
@@ -15,7 +16,8 @@ export const resolvers = {
 		addHabit: (_, habit, context) => {console.log("hi i'm paul"); return addHabit(context.user, habit)},
 		completeHabit: (_, {habitId, date, degreeOfCompletion}, context) => completeHabit(context.user.id, habitId, date, degreeOfCompletion),
 		deleteHabit: (_, {id}, context) => deleteHabit(context.user, id).then(a => console.log(a)),				
-		swapPriorities: (_, habitPriorities, {user}) => swapPriorities(user.id, ...Object.values(habitPriorities))
+		swapPriorities: (_, habitPriorities, {user}) => swapPriorities(user.id, ...Object.values(habitPriorities)),
+		requestAutomationUrl: ((_, {habitId}, {user}) => generateHabitAutomationKey(user.id, habitId))
 	},
 	Habit: {
 		owner: (habit) => {
@@ -97,12 +99,53 @@ export async function completeHabit(userId, id, date, degreeOfCompletion) {
   
   const updatedHabit = await habits.findOneAndUpdate(
 	{ _id: id },
-	{ $set: { datesCompleted, updatedAt: new Date() } },
+	{ $set: { datesCompleted, updatedAt: new Date(), automaticTracking: false } },
 	{ returnOriginal: false }
   );
   
   return toPublic(updatedHabit);
 }
+export async function automateCompleteHabit(habitId, automationKey) {
+	try {
+		const habit = await habits.findOne({_id: habitId, automationKey})
+		if(!habit) return "Unauthorized Bucko"
+		
+		const today = new Date().setUTCHours(0,0,0,0)
+		const datesCompleted = habit.datesCompleted || {};
+		// False, they scanned for the first time today
+		let automaticTrackingInProgress = habit.automaticTracking || false
+
+		switch(habit.type) {
+			case "QUANTITY":
+				datesCompleted[today] = (datesCompleted[today] || 0) + 1
+				break;
+			case "DURATION":
+				if(automaticTrackingInProgress) {
+					const elapsedHours = (new Date() - new Date(habit.updatedAt)) / (1000 * 60 * 60)
+					if (elapsedHours >= 3) // user forgot to stop tracking
+						automaticTrackingInProgress = true // resetting this as a new session
+					else {
+						datesCompleted[today] += elapsedHours
+						automaticTrackingInProgress = false // Stop tracking
+					}
+				} else {
+					automaticTrackingInProgress = true // Start tracking
+					datesCompleted[today] = (datesCompleted[today] || 0) + 0.016
+				}
+				break;
+			default:
+				datesCompleted[today] = true
+		}
+		return await habits.findOneAndUpdate(
+			{ _id: habitId },
+			{ $set: { datesCompleted, updatedAt: new Date(), automaticTracking: automaticTrackingInProgress } },
+			{ returnOriginal: false }
+		);
+	} catch(e) {
+		return e
+	}
+}
+
 export async function updateSelectableHabits() {
 	console.log("syncing selectable habits")
 	try {
@@ -140,4 +183,22 @@ export async function swapPriorities(userId, firstHabit, firstPriority, secondHa
 		await habits.findOneAndUpdate({_id: firstHabit, owner: userId}, {$set: {priority: firstPriority}}),
 		await habits.findOneAndUpdate({_id: secondHabit, owner: userId}, {$set: {priority: secondPriority}})
 	])
+}
+
+export async function generateHabitAutomationKey(user, habitId) {
+	const habit = (await habits.findOneAndUpdate(
+		{_id: habitId, owner: user},
+		[
+			{
+				$set: {
+					automationKey: {
+						$ifNull: ['$automationKey', crypto.randomBytes(16).toString('base64url')]
+					}
+				}
+			}
+		],
+		{returnNewDocument: true}
+	));
+	console.log({habit, user, habitId})
+	return habit.automationKey
 }

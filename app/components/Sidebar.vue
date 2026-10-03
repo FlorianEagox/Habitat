@@ -42,7 +42,7 @@
 		nav {
 			position: fixed;
 			bottom: 5px;
-			z-index: 1;
+			z-index: 98;
 			width: 100%;
 		}
 		nav ul {

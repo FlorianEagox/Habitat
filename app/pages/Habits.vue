@@ -38,7 +38,17 @@
 				<IconCheckbox id="private" v-model="form.private" text="Make Private" :icon-name="privacyStatus(form.private)" />
 				<IconCheckbox id="negative" v-model="form.negative" text="Negative Habit" :icon-name="negativityStatus(form.negative)[1]" />
 			</div>
-
+			<IconCheckbox id="automotive" v-if="isEditing" v-model="form.automation" text="Add Automation" icon-name="carbon:ibm-cloud-pak-network-automation" />
+			<div id="automation" v-if="form.automation">
+				<label class="form-label">
+					<span class="form-label-text">Trigger Habit Completion URL:</span>
+					<input v-model="form.automationUrl" class="form-control glassy" />
+					<button type="button" @click="writeToNFC">
+						<Icon name="mingcute:nfc-fill"/>
+						Write to NFC
+					</button>
+				</label>
+			</div>
 			<div class="actions">
 				<button class="glassy" type="submit">{{ isEditing ? 'Save' : 'Add Habit' }}</button>
 				<button class="glassy" type="button" @click="resetForm" v-if="isEditing">Cancel</button>
@@ -57,7 +67,7 @@ import globalHabits from '~/assets/selectableHabits'
 import { formatFloatToDuration, parseDurationToFloat } from '~/utils/textRendering'
 import useHabits from '~/composables/habits'
 
-const form = reactive({
+const baseForm = {
 	_id: null,
 	name: '',
 	type: 'BOOLEAN',
@@ -66,7 +76,11 @@ const form = reactive({
 	clonedFrom: null,
 	'private': false,
 	negative: false,
-})
+	automation: false,
+	automationUrl: ""
+}
+const form = reactive({...baseForm})
+
 const isEditing = ref(false)
 const showSuggestions = ref(false);
 
@@ -85,11 +99,7 @@ watch(selectedHabit, (newHabit) => {
 
 
 function resetForm() {
-	form._id = null
-	form.name = ''
-	form.type = 'BOOLEAN'
-	form.goal = null,
-	form['private'] = false,
+	Object.assign(form, baseForm)
 	isEditing.value = false
 }
 
@@ -120,7 +130,6 @@ async function addHabit() {
 		return
 	}
 }
-
 function populateForm(h) {
 	h.goal = formatFloatToDuration(h.goal)
 	Object.assign(form, h)
@@ -131,16 +140,51 @@ async function removeHabit(id) {
 	await GqlDeleteHabit({id})
 	await useHabits().refreshHabits()
 	sfxStore().randomSfxFromCategory('removeHabit')
-
 }
 
 
 function privacyStatus(isPrivate) {
 	return !isPrivate ? 'material-symbols:undereye-rounded' : 'streamline:invisible-1-solid'	
 }
-
 function negativityStatus(isNegative) {
 	return !isNegative ? ['Goal', 'icon-park-outline:positive-dynamics'] : ['Maximum Goal', 'pixelarticons:debug-off']	
+}
+
+watch(() => form.automation, async automate => {
+	if(automate) {
+		form.automationUrl = `${useRequestURL().origin}/api/automate/${form.id}/${(await GqlRequestAutomationUrl({habitId: form.id})).requestAutomationUrl}`
+	}
+})
+
+async function writeToNFC() {
+	if(!('NDEFReader' in window)) {
+		navigator.clipboard.writeText(form.automationUrl)
+		alert("Sorry Charlie, NFC wasn't found in your browser :/\n You can manually add this link to an NFC Tag, \n it's in clipboard ;)")
+		return
+	}
+
+	try {
+		console.log('Initializing NFC Hardware Connection...')
+		const ndef = new NDEFReader()
+		
+		await ndef.scan() 	
+		await ndef.write({
+			records: [{ 
+				recordType: "url", 
+				data: form.automationUrl 
+		}]})
+		let guideText = 'Scanning it will complete the habit'
+		if (form.type == 'QUANTITY')
+			guideText `${guideText} and increment it by 1 ${form.unit}`
+		else (form.type == 'DURATION')
+			guideText = 'Scanning it once will start the habit, scanning it again will finish it! (E.g. Starting and ending a timed workout)'
+		alert(`Wam, bam, thank you ma'am, your tag is written! ${guideText}`)
+		sfxStore().randomSfxFromCategory('addHabit')
+	} catch (error) {
+		alert(`NFC Error: ${error.message || error}`)
+	}
+
+	sfxStore().randomSfxFromCategory('addHabit')
 }
 
 </script>

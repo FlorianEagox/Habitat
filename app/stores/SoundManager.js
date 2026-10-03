@@ -25,7 +25,7 @@ export const sfxStore = defineStore('sfx', {
     }),
     actions: {
         playSound(category, path) {
-            if(self.isMuted) return
+            if(this.isMuted) return
             if(typeof this.sounds[category][path] === "string")
                 this.sounds[category][path] = new Howl({src: [this.sounds[category][path]], volume: this.volume})
             const id = this.sounds[category][path].play()

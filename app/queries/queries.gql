@@ -10,10 +10,12 @@ fragment HabitBase on Habit {
   goal
   unit
   createdAt
+  updatedAt
   datesCompleted
   private
   negative
 	priority
+  automaticTracking
   owner {
     ...UserCore
   }
@@ -168,4 +170,8 @@ mutation swapPriorities($firstHabit: ID, $firstPriority: Int, $secondHabit: ID, 
   swapPriorities(firstHabit: $firstHabit, firstPriority: $firstPriority, secondHabit: $secondHabit, secondPriority: $secondPriority) {
     ...HabitBase
   }
+}
+
+mutation requestAutomationUrl($habitId: ID!) {
+  requestAutomationUrl(habitId: $habitId)
 }
