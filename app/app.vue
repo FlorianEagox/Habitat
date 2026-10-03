@@ -4,7 +4,6 @@ export const authClient = createAuthClient({});
 
 </script>
 
-
 <template>
 	<div>
 		<NuxtRouteAnnouncer />
@@ -39,6 +38,8 @@ export const authClient = createAuthClient({});
 		
 		--ratio-x: 0;
 		--ratio-y: 0;
+
+		--accent-gradient: linear-gradient(-180deg, hsl(var(--electro)), hsl(var(--purple)));
 	}
 
 	body {

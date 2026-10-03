@@ -130,6 +130,8 @@ function populateForm(h) {
 async function removeHabit(id) {
 	await GqlDeleteHabit({id})
 	await useHabits().refreshHabits()
+	sfxStore().randomSfxFromCategory('removeHabit')
+
 }
 
 

@@ -23,7 +23,7 @@
 						<Icon name="material-symbols:box-edit-outline"/>
 						Edit
 					</button>
-					<button class="glassy action-button danger" @click="removeHabit(habit.id)">
+					<button class="glassy action-button danger" @click="() => deletingHabit = habit">
 						<Icon name="material-symbols:delete-outline"/>
 						Delete
 					</button>
@@ -31,17 +31,24 @@
 			</li>
 		</ul>
 		<p v-if="habits.length === 0" class="empty-text">No habits added yet. You're life, cast adift in the black sea, clinging to the splintering raft that is your crumbling foundation. <br> Add a habit above!</p>
+		<Modal v-if="deletingHabit"
+			:text="`Art thou certain thou desirest to abandon thine nobel pursuit of \n ${deletingHabit.name}`" 
+			@modal-confirm="removeHabit"
+			@modal-cancel="() => deletingHabit = null"
+		/>
 	</div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import useHabits from '~/composables/habits'
+import Modal from './Modal.vue'
 
 const toggleGrid = ref(false)
 const currentSwap = ref(null)
 const dragging = ref(null)
 const {habits, displayHabits, refreshHabits} = useHabits()
+const deletingHabit = ref(null)
 
 const emit = defineEmits(['edit', 'remove'])
 
@@ -58,9 +65,12 @@ function populateForm(habit) {
 	emit('edit', habit)
 }
 
-function removeHabit(id) {
-	emit('remove', id)
+function removeHabit() {
+	emit('remove', deletingHabit.value.id)
+	deletingHabit.value = null
 }
+
+
 async function swapHabitPriorities(habit) {
 	const draggingIndex = displayHabits.value.findIndex(e => e.id == dragging.value.id)
 	const dropIndex = displayHabits.value.findIndex(e => e.id == currentSwap.value.id);
