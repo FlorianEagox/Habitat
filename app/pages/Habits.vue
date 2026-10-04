@@ -1,7 +1,6 @@
 <template>
 	<div class="habits-page">
 		<h2 class="metal">Manage Your Habits</h2>
-		<hr>
 		<form class="habit-form glassy glowy-text" @submit.prevent="addHabit" novalidate>
 			<label class="form-label area-name">
 				<span class="form-label-text">Habit Name</span>
@@ -38,23 +37,33 @@
 				<IconCheckbox id="private" v-model="form.private" text="Make Private" :icon-name="privacyStatus(form.private)" />
 				<IconCheckbox id="negative" v-model="form.negative" text="Negative Habit" :icon-name="negativityStatus(form.negative)[1]" />
 			</div>
-			<IconCheckbox id="automotive" v-if="isEditing" v-model="form.automation" text="Add Automation" icon-name="carbon:ibm-cloud-pak-network-automation" />
-			<div id="automation" v-if="form.automation">
-				<label class="form-label">
-					<span class="form-label-text">Trigger Habit Completion URL:</span>
-					<input v-model="form.automationUrl" class="form-control glassy" />
-					<button type="button" @click="writeToNFC">
-						<Icon name="mingcute:nfc-fill"/>
-						Write to NFC
-					</button>
-				</label>
-			</div>
-			<div class="actions">
-				<button class="glassy" type="submit">{{ isEditing ? 'Save' : 'Add Habit' }}</button>
-				<button class="glassy" type="button" @click="resetForm" v-if="isEditing">Cancel</button>
+			<div class="form-actions">
+				<div class="actions">
+					<button class="glassy" type="submit">{{ isEditing ? 'Save' : 'Add Habit' }}</button>
+					<button class="glassy" type="button" @click="resetForm" v-if="isEditing">Cancel</button>
+				</div>
+				<div id="automotive" v-if="isEditing">
+					<IconCheckbox id="chk-automation" v-model="form.automation" text="Add Automation" icon-name="carbon:ibm-cloud-pak-network-automation" />
+					<div id="automation" v-if="form.automation">
+						<div class="form-label">
+							<span class="form-label-text">Trigger Habit Completion URL:</span>
+							<div id="automation-controls">
+								<button type="button" class="" @click="writeToNFC">
+									<Icon name="mingcute:nfc-fill"/>
+									Write NFC
+								</button>
+								<button type="button" class="" @click="copyUrl">
+									<Icon name="material-symbols:content-copy-rounded"/>
+									Copy
+								</button>
+								<input v-model="form.automationUrl" class="form-control glassy" />
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</form>
-		
+		<Modal v-if="writingNFC" :text="writingNFCStatus" :confirm-action="false" @modal-cancel="writingNFC = false"/>
 		<habits-list @edit="populateForm" @remove="removeHabit"/>
 	</div>
 </template>
@@ -102,6 +111,8 @@ function resetForm() {
 	Object.assign(form, baseForm)
 	isEditing.value = false
 }
+const writingNFC = ref(false)
+const writingNFCStatus = ref("Awaiting NFC Tag Scan")
 
 async function addHabit() {
 	console.log({form})
@@ -133,6 +144,7 @@ async function addHabit() {
 function populateForm(h) {
 	h.goal = formatFloatToDuration(h.goal)
 	Object.assign(form, h)
+	form.automation = h.automationUrl
 	isEditing.value = true
 }
 
@@ -141,7 +153,6 @@ async function removeHabit(id) {
 	await useHabits().refreshHabits()
 	sfxStore().randomSfxFromCategory('removeHabit')
 }
-
 
 function privacyStatus(isPrivate) {
 	return !isPrivate ? 'material-symbols:undereye-rounded' : 'streamline:invisible-1-solid'	
@@ -157,34 +168,37 @@ watch(() => form.automation, async automate => {
 })
 
 async function writeToNFC() {
+	writingNFC.value = true
 	if(!('NDEFReader' in window)) {
 		navigator.clipboard.writeText(form.automationUrl)
-		alert("Sorry Charlie, NFC wasn't found in your browser :/\n You can manually add this link to an NFC Tag, \n it's in clipboard ;)")
+		writingNFCStatus.value = "Sorry Charlie, NFC wasn't found in your browser :/\n You can manually add this link to an NFC Tag, \n it's in clipboard ;)"
 		return
 	}
 
 	try {
-		console.log('Initializing NFC Hardware Connection...')
 		const ndef = new NDEFReader()
 		
-		await ndef.scan() 	
 		await ndef.write({
 			records: [{ 
 				recordType: "url", 
 				data: form.automationUrl 
 		}]})
 		let guideText = 'Scanning it will complete the habit'
-		if (form.type == 'QUANTITY')
-			guideText `${guideText} and increment it by 1 ${form.unit}`
-		else (form.type == 'DURATION')
+		if (form.type.toUpperCase() == 'QUANTITY')
+			guideText = `${guideText} and increment it by 1 ${form.unit}`
+		else if (form.type.toUpperCase() == 'DURATION')
 			guideText = 'Scanning it once will start the habit, scanning it again will finish it! (E.g. Starting and ending a timed workout)'
-		alert(`Wam, bam, thank you ma'am, your tag is written! ${guideText}`)
+		writingNFCStatus.value = `Wam, bam, thank you ma'am, your tag is written! ${guideText}`
 		sfxStore().randomSfxFromCategory('addHabit')
 	} catch (error) {
-		alert(`NFC Error: ${error.message || error}`)
+		writingNFCStatus.value = `NFC Error: ${error.message || error} \n Please Try again`
 	}
 
 	sfxStore().randomSfxFromCategory('addHabit')
+}
+
+function copyUrl() {
+	navigator.clipboard.writeText(form.automationUrl)
 }
 
 </script>
@@ -214,6 +228,8 @@ h2 {
 	gap: 1em 2em;
 	margin-bottom: 2em;
 	align-items: end;
+	margin: auto;
+	/* padding-top: 0.5em; */
 }
 
 .area-name    { grid-area: name; }
@@ -257,10 +273,10 @@ h2 {
 	justify-content: center;
 	gap: 1em;
 	margin-top: 1em;
+}
+.form-actions {
 	grid-area: actions;
 }
-
-
 
 .empty-text {
 	margin-top: 2em;
@@ -268,6 +284,24 @@ h2 {
 	font-size: 1.1em;
 	text-align: center;
 	opacity: 0.7;
+}
+
+#automotive .form-label {
+	margin-top: 0.5em;
+}
+#automation-controls {
+	display: flex;
+	font-size: 0.8rem;
+	align-items: stretch;
+}
+
+#automotive button {
+	padding: 0.25em;
+	flex: 0;
+	margin: 0 0.25em;
+}
+#automotive input {
+	flex: 1;
 }
 
 
@@ -280,9 +314,10 @@ h2 {
 		min-width: 0;
 		max-width: 100%;
 		font-size: 0.9rem;
-		margin-top: 1em;
+		
+		padding-top: 1em;
 	}
-	.habit-form input, .habit-form label, button {
+	.habit-form input[type="text"], .habit-form label, button {
 		width: 90%;
 		box-sizing: border-box;
 		font-size: 0.8rem;

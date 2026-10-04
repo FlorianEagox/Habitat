@@ -4,8 +4,8 @@
 			<div id="modal" class="glassy">
 				<p id="modal-txt" v-text="text" />
 				<div id="btns">
-					<button class="action-button  danger" @click="() => $emit('modalConfirm')">Confirm</button>
-					<button class="action-button" @click="() => $emit('modalCancel')">Cancel</button>
+					<button class="action-button danger" v-if="confirmAction" @click="() => $emit('modalConfirm')">Confirm</button>
+					<button class="action-button" @click="() => $emit('modalCancel')"> {{ confirmAction ? 'Cancel' : 'Gotcha'}}</button>
 				</div>
 			</div>
 		</div>
@@ -14,7 +14,8 @@
 
 <script setup>
 	const props = defineProps({
-		text: String
+		text: String,
+		confirmAction: {type: Boolean, default: true}
 	})
 	const emit = defineEmits(['modalConfirm', 'modalCancel'])
 </script>

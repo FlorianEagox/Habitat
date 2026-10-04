@@ -211,5 +211,8 @@ async function passwordReset() {
 			width: 100%;
 			box-sizing: border-box;
 		}
+		form input[type="checkbox"] {
+			width: auto;
+		}
 	}
 </style>

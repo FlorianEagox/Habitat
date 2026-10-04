@@ -10,6 +10,7 @@ const habits = db.get('habits');
 export const resolvers = {
 	Query: {
 		habits: (_, {owner}, context) => getHabits(context.user, owner),
+		habit: (_, {id}, context) => getHabit(id, context.user.id),
 		selectableHabits: () => getSelectableHabits()
 	},
 	Mutation: {

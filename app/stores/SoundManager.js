@@ -52,6 +52,15 @@ export const sfxStore = defineStore('sfx', {
                     sfxStore().randomSfxFromCategory('hitGoal')
                 else if(habit.negative && (degreeOfCompletion && degreeOfCompletion <= habit.goal))
                     sfxStore().randomSfxFromCategory('hitGoal')   
+        },
+        playBlob(data) {
+            const blob = URL.createObjectURL(data)
+            new Howl({
+                src: [blob],
+                volume: this.volume,
+                format: ['mp3'],
+                onend: () => URL.revokeObjectURL(blob),
+            }).play()
         }
     }
 

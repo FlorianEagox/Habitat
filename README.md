@@ -20,7 +20,7 @@ Make an account and add all the things you'd like to spend your life doing, and 
     - Graph of each habit completion over  time
     - Good vs bad breakdown
 - ~~NFC Tag support to complete habits automagicaly! (come on this one is fucking awesome you know it)~~
-    - On Page NFC updates
+    - ~~On Page NFC updates~~
 - Stories? Like milestone tracking where you can upload a picture, or share a note
 - ~~Points system based on how based on hitting goals?~~
 - ~~Streaks tracking, that shows the longest you've done a habit as a streak. and your current record~~

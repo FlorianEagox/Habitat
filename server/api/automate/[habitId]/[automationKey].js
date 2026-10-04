@@ -1,26 +1,25 @@
 // server/api/automate/[habitId]/[automationKey].get.ts
 import { automateCompleteHabit } from "~~/server/resolvers/habits"
-import { sendStream, setHeaders, createError } from 'h3'
+import { sendStream, setHeaders, getHeader, createError } from 'h3'
 import fs from 'node:fs'
 import path from 'node:path'
 
 export default defineEventHandler(async (event) => {
-    const { habitId, automationKey } = event.context.params
-    
-    const trackedHabit = await automateCompleteHabit(habitId, automationKey)
-    const sfxCategory = trackedHabit.negative ? 'completeHabitNegative' :
-        Object.values(trackedHabit.datesCompleted).pop() >= (trackedHabit.goal || 0) ? 'hitGoal' : 'completeHabitPositive' 
-    const sfxCategoryDir = path.resolve(process.cwd(), `app/assets/sfx/${sfxCategory}`)
+	const { habitId, automationKey } = event.context.params
+	const source = getHeader(event, 'source') || ''
 
-    const files = fs.readdirSync(sfxCategoryDir)
+	const trackedHabit = await automateCompleteHabit(habitId, automationKey)
+	const sfxCategory = trackedHabit.negative ? 'completeHabitNegative' :
+		parseFloat(Object.values(trackedHabit.datesCompleted).pop() || 0) >= (trackedHabit.goal || 0) ? 'hitGoal' : 'completeHabitPositive' 
+	const sfxCategoryDir = path.resolve(process.cwd(), `app/assets/sfx/${sfxCategory}`)
+	const possibleFiles = fs.readdirSync(sfxCategoryDir)
 
-    const randomFile = files[(Math.random() * files.length) | 0]
-    const filePath = path.join(sfxCategoryDir, randomFile)
+	const randomFile = possibleFiles[(Math.random() * possibleFiles.length) | 0]
+	const filePath = path.join(sfxCategoryDir, randomFile)
 
-    // 4. Declare that this route outputs an MP3 binary
-    setHeaders(event, {
-        'Content-Type': 'audio/mpeg'
-    })
-
-    return sendStream(event, fs.createReadStream(filePath))
+	setHeaders(event, {'Content-Type': 'audio/mpeg'})
+	if(source == 'habitat')
+		return sendStream(event, fs.createReadStream(filePath))
+	else
+		return sendRedirect(event, `/nfc?habitId=${trackedHabit._id}&sfx=${sfxCategory}`)
 })
